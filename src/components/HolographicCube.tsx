@@ -535,11 +535,30 @@ export default function HolographicCube({
       ]
       
       for (let i = 0; i < numRays; i++) {
-        const angle = (i / numRays) * Math.PI * 2
+        const baseAngle = (i / numRays) * Math.PI * 2
         const rayLength = 3.5
-        const rayWidth = 0.08
+        const spiralTurns = 2.5
+        const tubeRadius = 0.04
         
-        const rayGeometry = new THREE.ConeGeometry(rayWidth, rayLength, 4, 1, true)
+        const points: THREE.Vector3[] = []
+        const segments = 80
+        
+        for (let j = 0; j <= segments; j++) {
+          const t = j / segments
+          const spiralAngle = baseAngle + t * spiralTurns * Math.PI * 2
+          const distance = t * rayLength
+          const radius = 0.02 + t * 0.15
+          
+          const x = Math.cos(spiralAngle) * radius
+          const z = Math.sin(spiralAngle) * radius
+          const y = distance
+          
+          points.push(new THREE.Vector3(x, y, z))
+        }
+        
+        const curve = new THREE.CatmullRomCurve3(points)
+        const tubeGeometry = new THREE.TubeGeometry(curve, segments, tubeRadius, 8, false)
+        
         const rayMaterial = new THREE.ShaderMaterial({
           uniforms: {
             time: { value: 0 },
@@ -564,13 +583,14 @@ export default function HolographicCube({
             
             void main() {
               float pulse = sin(time * 2.0 + offset) * 0.3 + 0.7;
-              float gradient = 1.0 - vUv.y;
+              float gradient = 1.0 - vUv.x;
               
-              float shimmer = sin(vUv.y * 20.0 + time * 3.0) * 0.2 + 0.8;
+              float shimmer = sin(vUv.x * 15.0 + time * 3.0) * 0.3 + 0.7;
+              float energyFlow = sin(vUv.x * 8.0 - time * 4.0) * 0.5 + 0.5;
               
-              float alpha = gradient * gradient * pulse * 0.6;
+              float alpha = gradient * gradient * pulse * 0.7 * energyFlow;
               
-              vec3 color = baseColor * shimmer;
+              vec3 color = baseColor * shimmer * (1.0 + energyFlow * 0.5);
               
               gl_FragColor = vec4(color, alpha);
             }
@@ -581,17 +601,13 @@ export default function HolographicCube({
           depthWrite: false
         })
         
-        const ray = new THREE.Mesh(rayGeometry, rayMaterial)
+        const ray = new THREE.Mesh(tubeGeometry, rayMaterial)
         
         ray.position.y = 0.275
         ray.rotation.z = Math.PI
         
-        const directionX = Math.cos(angle)
-        const directionZ = Math.sin(angle)
-        const spreadAngle = Math.PI / 6
-        
-        ray.rotation.x = Math.cos(angle) * spreadAngle
-        ray.rotation.y = angle
+        const directionX = Math.cos(baseAngle)
+        const directionZ = Math.sin(baseAngle)
         
         ray.position.x = directionX * 0.15
         ray.position.z = directionZ * 0.15
