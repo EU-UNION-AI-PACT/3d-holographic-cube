@@ -692,10 +692,16 @@ export default function HolographicCube({
       })
 
       const { leftOpen, rightOpen, topOpen, bottomOpen, animationSpeed } = animationStateRef.current
-      const speed = animationSpeed / 100
+      const baseSpeed = animationSpeed / 100
+      
+      const smoothEasing = (t: number) => {
+        return t < 0.5 
+          ? 4 * t * t * t 
+          : 1 - Math.pow(-2 * t + 2, 3) / 2
+      }
 
       if (cameraRef.current && controlsRef.current) {
-        const lerpSpeed = 0.05
+        const lerpSpeed = 0.03
         cameraRef.current.position.x = THREE.MathUtils.lerp(
           cameraRef.current.position.x,
           targetCameraPosition.current.x,
@@ -730,38 +736,50 @@ export default function HolographicCube({
       }
 
       if (panelsRef.current.left) {
-        const targetRotation = leftOpen * Math.PI / 2
+        const targetRotation = Math.PI / 2 + (leftOpen * Math.PI / 2)
+        const currentRotation = panelsRef.current.left.rotation.y
+        const delta = targetRotation - currentRotation
+        const easedSpeed = baseSpeed * 0.15 * (1 - Math.exp(-Math.abs(delta) * 2))
         panelsRef.current.left.rotation.y = THREE.MathUtils.lerp(
-          panelsRef.current.left.rotation.y,
-          Math.PI / 2 + targetRotation,
-          speed
+          currentRotation,
+          targetRotation,
+          Math.min(easedSpeed, 0.08)
         )
       }
 
       if (panelsRef.current.right) {
-        const targetRotation = rightOpen * Math.PI / 2
+        const targetRotation = -Math.PI / 2 - (rightOpen * Math.PI / 2)
+        const currentRotation = panelsRef.current.right.rotation.y
+        const delta = targetRotation - currentRotation
+        const easedSpeed = baseSpeed * 0.15 * (1 - Math.exp(-Math.abs(delta) * 2))
         panelsRef.current.right.rotation.y = THREE.MathUtils.lerp(
-          panelsRef.current.right.rotation.y,
-          -Math.PI / 2 - targetRotation,
-          speed
+          currentRotation,
+          targetRotation,
+          Math.min(easedSpeed, 0.08)
         )
       }
 
       if (panelsRef.current.top) {
-        const targetRotation = topOpen * Math.PI / 2
+        const targetRotation = -Math.PI / 2 - (topOpen * Math.PI / 2)
+        const currentRotation = panelsRef.current.top.rotation.x
+        const delta = targetRotation - currentRotation
+        const easedSpeed = baseSpeed * 0.15 * (1 - Math.exp(-Math.abs(delta) * 2))
         panelsRef.current.top.rotation.x = THREE.MathUtils.lerp(
-          panelsRef.current.top.rotation.x,
-          -Math.PI / 2 - targetRotation,
-          speed
+          currentRotation,
+          targetRotation,
+          Math.min(easedSpeed, 0.08)
         )
       }
 
       if (panelsRef.current.bottom) {
-        const targetRotation = bottomOpen * Math.PI / 2
+        const targetRotation = Math.PI / 2 + (bottomOpen * Math.PI / 2)
+        const currentRotation = panelsRef.current.bottom.rotation.x
+        const delta = targetRotation - currentRotation
+        const easedSpeed = baseSpeed * 0.15 * (1 - Math.exp(-Math.abs(delta) * 2))
         panelsRef.current.bottom.rotation.x = THREE.MathUtils.lerp(
-          panelsRef.current.bottom.rotation.x,
-          Math.PI / 2 + targetRotation,
-          speed
+          currentRotation,
+          targetRotation,
+          Math.min(easedSpeed, 0.08)
         )
       }
 
