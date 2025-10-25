@@ -104,37 +104,57 @@ export default function HolographicCube({
       })
     }
 
-    const createGlowingEdge = (color: number = 0x00ffff) => {
+    const createGlowingEdge = () => {
       return new THREE.ShaderMaterial({
         uniforms: {
-          color: { value: new THREE.Color(color) },
           time: { value: 0 }
         },
         vertexShader: `
           varying vec3 vPosition;
+          varying vec3 vNormal;
           void main() {
             vPosition = position;
+            vNormal = normalize(normalMatrix * normal);
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
           }
         `,
         fragmentShader: `
-          uniform vec3 color;
           uniform float time;
           varying vec3 vPosition;
+          varying vec3 vNormal;
+          
+          float random(vec2 st) {
+            return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+          }
           
           void main() {
-            float sparkle = sin(vPosition.x * 20.0 + time * 3.0) * 0.5 + 0.5;
-            sparkle *= sin(vPosition.y * 20.0 + time * 4.0) * 0.5 + 0.5;
-            sparkle *= sin(vPosition.z * 20.0 + time * 5.0) * 0.5 + 0.5;
+            vec3 silverBase = vec3(0.85, 0.87, 0.92);
+            vec3 silverHighlight = vec3(1.0, 1.0, 1.0);
             
-            float pulse = sin(time * 2.0) * 0.3 + 0.7;
-            float intensity = sparkle * pulse + 0.5;
+            float sparkle1 = sin(vPosition.x * 50.0 + time * 8.0) * 0.5 + 0.5;
+            float sparkle2 = sin(vPosition.y * 60.0 + time * 10.0) * 0.5 + 0.5;
+            float sparkle3 = sin(vPosition.z * 55.0 + time * 12.0) * 0.5 + 0.5;
             
-            gl_FragColor = vec4(color * intensity, 1.0);
+            float noise1 = random(vPosition.xy + time * 0.5);
+            float noise2 = random(vPosition.yz + time * 0.7);
+            float noise3 = random(vPosition.zx + time * 0.3);
+            
+            float crystalSparkle = (noise1 * noise2 * noise3) > 0.85 ? 1.0 : 0.0;
+            float shimmer = sparkle1 * sparkle2 * sparkle3;
+            
+            float pulse = sin(time * 3.0) * 0.4 + 0.6;
+            
+            vec3 finalColor = mix(silverBase, silverHighlight, shimmer * pulse);
+            finalColor += silverHighlight * crystalSparkle * 0.8;
+            
+            float glow = pulse * 1.2;
+            finalColor *= glow;
+            
+            gl_FragColor = vec4(finalColor, 1.0);
           }
         `,
         transparent: true,
-        linewidth: 3
+        linewidth: 4
       })
     }
 
@@ -167,7 +187,7 @@ export default function HolographicCube({
     const leftGeometry = new THREE.ShapeGeometry(starShape)
     const leftMesh = new THREE.Mesh(leftGeometry, createNeonMaterial(0x00ffff))
     const leftEdges = new THREE.EdgesGeometry(leftGeometry)
-    const leftLineMaterial = createGlowingEdge(0x00ffff)
+    const leftLineMaterial = createGlowingEdge()
     const leftLine = new THREE.LineSegments(leftEdges, leftLineMaterial)
     leftGroup.add(leftMesh)
     leftGroup.add(leftLine)
@@ -181,7 +201,7 @@ export default function HolographicCube({
     const rightGeometry = new THREE.ShapeGeometry(starShape)
     const rightMesh = new THREE.Mesh(rightGeometry, createNeonMaterial(0x00ffff))
     const rightEdges = new THREE.EdgesGeometry(rightGeometry)
-    const rightLineMaterial = createGlowingEdge(0x00ffff)
+    const rightLineMaterial = createGlowingEdge()
     const rightLine = new THREE.LineSegments(rightEdges, rightLineMaterial)
     rightGroup.add(rightMesh)
     rightGroup.add(rightLine)
@@ -195,7 +215,7 @@ export default function HolographicCube({
     const topGeometry = new THREE.ShapeGeometry(starShape)
     const topMesh = new THREE.Mesh(topGeometry, createNeonMaterial(0xff00ff))
     const topEdges = new THREE.EdgesGeometry(topGeometry)
-    const topLineMaterial = createGlowingEdge(0xff00ff)
+    const topLineMaterial = createGlowingEdge()
     const topLine = new THREE.LineSegments(topEdges, topLineMaterial)
     topGroup.add(topMesh)
     topGroup.add(topLine)
@@ -209,7 +229,7 @@ export default function HolographicCube({
     const bottomGeometry = new THREE.ShapeGeometry(starShape)
     const bottomMesh = new THREE.Mesh(bottomGeometry, createNeonMaterial(0xff00ff))
     const bottomEdges = new THREE.EdgesGeometry(bottomGeometry)
-    const bottomLineMaterial = createGlowingEdge(0xff00ff)
+    const bottomLineMaterial = createGlowingEdge()
     const bottomLine = new THREE.LineSegments(bottomEdges, bottomLineMaterial)
     bottomGroup.add(bottomMesh)
     bottomGroup.add(bottomLine)
@@ -222,7 +242,7 @@ export default function HolographicCube({
     const frontGeometry = new THREE.ShapeGeometry(starShape)
     const frontMesh = new THREE.Mesh(frontGeometry, createNeonMaterial(0x00ff99, 0.1))
     const frontEdges = new THREE.EdgesGeometry(frontGeometry)
-    const frontLineMaterial = createGlowingEdge(0x00ff99)
+    const frontLineMaterial = createGlowingEdge()
     const frontLine = new THREE.LineSegments(frontEdges, frontLineMaterial)
     frontMesh.position.z = starSize / 2
     frontLine.position.z = starSize / 2
@@ -233,7 +253,7 @@ export default function HolographicCube({
     const backGeometry = new THREE.ShapeGeometry(starShape)
     const backMesh = new THREE.Mesh(backGeometry, createNeonMaterial(0x00ff99, 0.1))
     const backEdges = new THREE.EdgesGeometry(backGeometry)
-    const backLineMaterial = createGlowingEdge(0x00ff99)
+    const backLineMaterial = createGlowingEdge()
     const backLine = new THREE.LineSegments(backEdges, backLineMaterial)
     backMesh.position.z = -starSize / 2
     backLine.position.z = -starSize / 2
