@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -50,6 +50,11 @@ const steps = [
 
 export default function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
   const [currentStep, setCurrentStep] = useState(0)
+  const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 })
+
+  useEffect(() => {
+    setDimensions({ width: window.innerWidth, height: window.innerHeight })
+  }, [])
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -80,8 +85,8 @@ export default function OnboardingOverlay({ onComplete }: OnboardingOverlayProps
               key={i}
               className="absolute w-1 h-1 bg-primary rounded-full"
               initial={{
-                x: Math.random() * window.innerWidth,
-                y: Math.random() * window.innerHeight,
+                x: Math.random() * dimensions.width,
+                y: Math.random() * dimensions.height,
                 opacity: 0
               }}
               animate={{
