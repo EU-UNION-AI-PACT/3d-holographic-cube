@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 import HolographicCube from '@/components/HolographicCube'
 import CertificatePage from '@/components/CertificatePage'
+import OwnagePage from '@/components/OwnagePage'
 import SparklingBackground from '@/components/SparklingBackground'
 import OnboardingOverlay from '@/components/OnboardingOverlay'
 import { Card } from '@/components/ui/card'
@@ -19,7 +20,8 @@ import {
   Pause,
   Certificate,
   Star,
-  Lightbulb
+  Lightbulb,
+  Crown
 } from '@phosphor-icons/react'
 
 function App() {
@@ -28,6 +30,7 @@ function App() {
   const [animationSpeed, setAnimationSpeed] = useKV<number>('animation-speed', 5)
   const [isAnimating, setIsAnimating] = useState(false)
   const [showCertificate, setShowCertificate] = useKV<boolean>('show-certificate', false)
+  const [showOwnage, setShowOwnage] = useKV<boolean>('show-ownage', false)
   const [lampOn, setLampOn] = useKV<boolean>('lamp-on', true)
   const [hasSeenOnboarding, setHasSeenOnboarding] = useKV<boolean>('has-seen-onboarding', false)
 
@@ -83,7 +86,7 @@ function App() {
       
       <SparklingBackground />
       
-      {!showCertificate && (
+      {!showCertificate && !showOwnage && (
         <HolographicCube
           leftOpen={leftOpen}
           rightOpen={rightOpen}
@@ -96,15 +99,21 @@ function App() {
         />
       )}
 
-      {showCertificate && (
+      {showCertificate && !showOwnage && (
         <div className="absolute inset-0 z-10 overflow-y-auto">
           <CertificatePage />
         </div>
       )}
 
+      {showOwnage && (
+        <div className="absolute inset-0 z-10 overflow-y-auto">
+          <OwnagePage />
+        </div>
+      )}
+
       <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
         <h1 className="text-4xl font-bold neon-glow text-center tracking-tight">
-          {showCertificate ? 'EU-UNION CERTIFICATE' : 'HOLOGRAPHIC STAR'}
+          {showOwnage ? 'WO OWND DER?' : showCertificate ? 'EU-UNION CERTIFICATE' : 'HOLOGRAPHIC STAR'}
         </h1>
       </div>
 
@@ -118,7 +127,21 @@ function App() {
           <Lightbulb weight={lampOn ? 'fill' : 'regular'} />
         </Button>
         <Button
-          onClick={() => setShowCertificate(!showCertificate)}
+          onClick={() => {
+            setShowOwnage(!showOwnage)
+            if (!showOwnage) setShowCertificate(false)
+          }}
+          variant="outline"
+          size="icon"
+          className={`bg-card/80 backdrop-blur-md border-primary/30 ${showOwnage ? 'text-accent border-accent/50' : ''}`}
+        >
+          <Crown weight={showOwnage ? 'fill' : 'bold'} />
+        </Button>
+        <Button
+          onClick={() => {
+            setShowCertificate(!showCertificate)
+            if (!showCertificate) setShowOwnage(false)
+          }}
           variant="outline"
           size="icon"
           className="bg-card/80 backdrop-blur-md border-primary/30"
@@ -129,7 +152,7 @@ function App() {
 
       <Card className="absolute bottom-6 left-6 p-6 neon-border bg-card/80 backdrop-blur-md z-10 w-80">
         <div className="space-y-6">
-          {!showCertificate && (
+          {!showCertificate && !showOwnage && (
             <>
               <div>
                 <h2 className="text-lg font-semibold mb-4 text-primary">Panel Controls</h2>
@@ -257,10 +280,29 @@ function App() {
               </Button>
             </div>
           )}
+
+          {showOwnage && (
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 mx-auto rounded-full bg-accent/20 flex items-center justify-center">
+                <Crown weight="bold" className="w-8 h-8 text-accent" />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Wo ownd der?
+              </p>
+              <Button
+                onClick={() => setShowOwnage(false)}
+                variant="outline"
+                className="w-full"
+              >
+                <Star weight="bold" className="mr-2" />
+                Back to Star
+              </Button>
+            </div>
+          )}
         </div>
       </Card>
 
-      {!showCertificate && (
+      {!showCertificate && !showOwnage && (
         <Card className="absolute bottom-6 right-6 p-4 neon-border bg-card/80 backdrop-blur-md z-10">
           <div className="space-y-2 text-xs text-muted-foreground">
             <div className="flex items-center gap-2">
