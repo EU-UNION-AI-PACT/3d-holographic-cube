@@ -282,59 +282,59 @@ export default function HolographicCube({
     lampGroupRef.current = lampGroup
     
     const lampBase = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.15, 0.2, 0.4, 32),
+      new THREE.CylinderGeometry(0.08, 0.12, 0.3, 32),
       new THREE.MeshPhysicalMaterial({
         color: 0xFFD700,
         metalness: 0.9,
         roughness: 0.1,
         emissive: 0xFFD700,
-        emissiveIntensity: 0.5
+        emissiveIntensity: 0.3
       })
     )
-    lampBase.position.y = -0.2
+    lampBase.position.y = -0.15
     lampGroup.add(lampBase)
     
     const lampNeck = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.05, 0.05, 0.3, 16),
+      new THREE.CylinderGeometry(0.02, 0.02, 0.25, 16),
       new THREE.MeshPhysicalMaterial({
         color: 0xFFD700,
         metalness: 0.9,
         roughness: 0.1
       })
     )
-    lampNeck.position.y = 0.15
+    lampNeck.position.y = 0.125
     lampGroup.add(lampNeck)
     
     const lampTop = new THREE.Mesh(
-      new THREE.SphereGeometry(0.25, 32, 32),
+      new THREE.SphereGeometry(0.15, 32, 32),
       new THREE.MeshPhysicalMaterial({
         color: 0xFF1493,
         emissive: 0xFF1493,
-        emissiveIntensity: 3,
+        emissiveIntensity: 2.5,
         transparent: true,
-        opacity: 0.9,
+        opacity: 0.85,
         metalness: 0.3,
         roughness: 0.2
       })
     )
-    lampTop.position.y = 0.35
+    lampTop.position.y = 0.275
     lampGroup.add(lampTop)
     lampTopRef.current = lampTop
     
-    const lampGlow = new THREE.PointLight(0xFF1493, 5, 8)
-    lampGlow.position.y = 0.35
+    const lampGlow = new THREE.PointLight(0xFF1493, 3, 6)
+    lampGlow.position.y = 0.275
     lampGroup.add(lampGlow)
     lampGlowRef.current = lampGlow
     
     const pinkGlow = new THREE.Mesh(
-      new THREE.SphereGeometry(0.35, 32, 32),
+      new THREE.SphereGeometry(0.22, 32, 32),
       new THREE.MeshBasicMaterial({
         color: 0xFFC0CB,
         transparent: true,
-        opacity: 0.3
+        opacity: 0.2
       })
     )
-    pinkGlow.position.y = 0.35
+    pinkGlow.position.y = 0.275
     lampGroup.add(pinkGlow)
     pinkGlowRef.current = pinkGlow
     
@@ -374,13 +374,13 @@ export default function HolographicCube({
           )
         ])
         
-        const tubeGeometry = new THREE.TubeGeometry(curve, 64, 0.015, 8, false)
+        const tubeGeometry = new THREE.TubeGeometry(curve, 64, 0.005, 8, false)
         const tubeMaterial = new THREE.MeshPhysicalMaterial({
           color: 0x00ffff,
           emissive: 0x00ffff,
-          emissiveIntensity: 2,
+          emissiveIntensity: 1.5,
           transparent: true,
-          opacity: 0.7,
+          opacity: 0.6,
           metalness: 0.8,
           roughness: 0.2,
           transmission: 0.5
@@ -399,7 +399,7 @@ export default function HolographicCube({
           particlePositions[j * 3] = point.x
           particlePositions[j * 3 + 1] = point.y
           particlePositions[j * 3 + 2] = point.z
-          particleSizes[j] = Math.random() * 0.05 + 0.02
+          particleSizes[j] = Math.random() * 0.03 + 0.015
         }
         
         const particleGeometry = new THREE.BufferGeometry()
@@ -472,13 +472,13 @@ export default function HolographicCube({
       
       sephirot.forEach(seph => {
         const sphere = new THREE.Mesh(
-          new THREE.SphereGeometry(0.08, 16, 16),
+          new THREE.SphereGeometry(0.05, 16, 16),
           new THREE.MeshPhysicalMaterial({
             color: seph.color,
             emissive: seph.color,
-            emissiveIntensity: 1.5,
+            emissiveIntensity: 1.2,
             transparent: true,
-            opacity: 0.8,
+            opacity: 0.75,
             metalness: 0.5,
             roughness: 0.2
           })
@@ -486,7 +486,7 @@ export default function HolographicCube({
         sphere.position.copy(seph.pos)
         treeGroup.add(sphere)
         
-        const light = new THREE.PointLight(seph.color, 0.5, 1)
+        const light = new THREE.PointLight(seph.color, 0.3, 0.8)
         light.position.copy(seph.pos)
         treeGroup.add(light)
       })
@@ -500,8 +500,8 @@ export default function HolographicCube({
         const material = new THREE.LineBasicMaterial({
           color: 0xFFC0CB,
           transparent: true,
-          opacity: 0.6,
-          linewidth: 2
+          opacity: 0.4,
+          linewidth: 1
         })
         
         const line = new THREE.Line(geometry, material)
@@ -866,13 +866,13 @@ export default function HolographicCube({
   useEffect(() => {
     if (lampGlowRef.current && lampTopRef.current) {
       if (lampOn) {
-        lampGlowRef.current.intensity = 5
+        lampGlowRef.current.intensity = 3
         const material = lampTopRef.current.material as THREE.MeshPhysicalMaterial
-        material.emissiveIntensity = 3
+        material.emissiveIntensity = 2.5
       } else {
         lampGlowRef.current.intensity = 0
         const material = lampTopRef.current.material as THREE.MeshPhysicalMaterial
-        material.emissiveIntensity = 0.3
+        material.emissiveIntensity = 0.2
       }
     }
   }, [lampOn])
