@@ -32,6 +32,7 @@ export default function HolographicCube({
     top: THREE.Group | null
     bottom: THREE.Group | null
   }>({ left: null, right: null, top: null, bottom: null })
+  const edgeLinesRef = useRef<THREE.LineSegments[]>([])
   const animationStateRef = useRef({ leftOpen, rightOpen, topOpen, bottomOpen, animationSpeed })
 
   useEffect(() => {
@@ -104,11 +105,36 @@ export default function HolographicCube({
     }
 
     const createGlowingEdge = (color: number = 0x00ffff) => {
-      return new THREE.LineBasicMaterial({
-        color: color,
-        linewidth: 3,
+      return new THREE.ShaderMaterial({
+        uniforms: {
+          color: { value: new THREE.Color(color) },
+          time: { value: 0 }
+        },
+        vertexShader: `
+          varying vec3 vPosition;
+          void main() {
+            vPosition = position;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform vec3 color;
+          uniform float time;
+          varying vec3 vPosition;
+          
+          void main() {
+            float sparkle = sin(vPosition.x * 20.0 + time * 3.0) * 0.5 + 0.5;
+            sparkle *= sin(vPosition.y * 20.0 + time * 4.0) * 0.5 + 0.5;
+            sparkle *= sin(vPosition.z * 20.0 + time * 5.0) * 0.5 + 0.5;
+            
+            float pulse = sin(time * 2.0) * 0.3 + 0.7;
+            float intensity = sparkle * pulse + 0.5;
+            
+            gl_FragColor = vec4(color * intensity, 1.0);
+          }
+        `,
         transparent: true,
-        opacity: 1.0
+        linewidth: 3
       })
     }
 
@@ -118,69 +144,81 @@ export default function HolographicCube({
     const leftGeometry = new THREE.PlaneGeometry(cubeSize, cubeSize)
     const leftMesh = new THREE.Mesh(leftGeometry, createNeonMaterial(0x00ffff))
     const leftEdges = new THREE.EdgesGeometry(leftGeometry)
-    const leftLine = new THREE.LineSegments(leftEdges, createGlowingEdge(0x00ffff))
+    const leftLineMaterial = createGlowingEdge(0x00ffff)
+    const leftLine = new THREE.LineSegments(leftEdges, leftLineMaterial)
     leftGroup.add(leftMesh)
     leftGroup.add(leftLine)
     leftGroup.position.x = -cubeSize / 2
     leftGroup.rotation.y = Math.PI / 2
     scene.add(leftGroup)
     panelsRef.current.left = leftGroup
+    edgeLinesRef.current.push(leftLine)
 
     const rightGroup = new THREE.Group()
     const rightGeometry = new THREE.PlaneGeometry(cubeSize, cubeSize)
     const rightMesh = new THREE.Mesh(rightGeometry, createNeonMaterial(0x00ffff))
     const rightEdges = new THREE.EdgesGeometry(rightGeometry)
-    const rightLine = new THREE.LineSegments(rightEdges, createGlowingEdge(0x00ffff))
+    const rightLineMaterial = createGlowingEdge(0x00ffff)
+    const rightLine = new THREE.LineSegments(rightEdges, rightLineMaterial)
     rightGroup.add(rightMesh)
     rightGroup.add(rightLine)
     rightGroup.position.x = cubeSize / 2
     rightGroup.rotation.y = -Math.PI / 2
     scene.add(rightGroup)
     panelsRef.current.right = rightGroup
+    edgeLinesRef.current.push(rightLine)
 
     const topGroup = new THREE.Group()
     const topGeometry = new THREE.PlaneGeometry(cubeSize, cubeSize)
     const topMesh = new THREE.Mesh(topGeometry, createNeonMaterial(0xff00ff))
     const topEdges = new THREE.EdgesGeometry(topGeometry)
-    const topLine = new THREE.LineSegments(topEdges, createGlowingEdge(0xff00ff))
+    const topLineMaterial = createGlowingEdge(0xff00ff)
+    const topLine = new THREE.LineSegments(topEdges, topLineMaterial)
     topGroup.add(topMesh)
     topGroup.add(topLine)
     topGroup.position.y = cubeSize / 2
     topGroup.rotation.x = -Math.PI / 2
     scene.add(topGroup)
     panelsRef.current.top = topGroup
+    edgeLinesRef.current.push(topLine)
 
     const bottomGroup = new THREE.Group()
     const bottomGeometry = new THREE.PlaneGeometry(cubeSize, cubeSize)
     const bottomMesh = new THREE.Mesh(bottomGeometry, createNeonMaterial(0xff00ff))
     const bottomEdges = new THREE.EdgesGeometry(bottomGeometry)
-    const bottomLine = new THREE.LineSegments(bottomEdges, createGlowingEdge(0xff00ff))
+    const bottomLineMaterial = createGlowingEdge(0xff00ff)
+    const bottomLine = new THREE.LineSegments(bottomEdges, bottomLineMaterial)
     bottomGroup.add(bottomMesh)
     bottomGroup.add(bottomLine)
     bottomGroup.position.y = -cubeSize / 2
     bottomGroup.rotation.x = Math.PI / 2
     scene.add(bottomGroup)
     panelsRef.current.bottom = bottomGroup
+    edgeLinesRef.current.push(bottomLine)
 
     const frontGeometry = new THREE.PlaneGeometry(cubeSize, cubeSize)
     const frontMesh = new THREE.Mesh(frontGeometry, createNeonMaterial(0x00ff99, 0.1))
     const frontEdges = new THREE.EdgesGeometry(frontGeometry)
-    const frontLine = new THREE.LineSegments(frontEdges, createGlowingEdge(0x00ff99))
+    const frontLineMaterial = createGlowingEdge(0x00ff99)
+    const frontLine = new THREE.LineSegments(frontEdges, frontLineMaterial)
     frontMesh.position.z = cubeSize / 2
     frontLine.position.z = cubeSize / 2
     scene.add(frontMesh)
     scene.add(frontLine)
+    edgeLinesRef.current.push(frontLine)
 
     const backGeometry = new THREE.PlaneGeometry(cubeSize, cubeSize)
     const backMesh = new THREE.Mesh(backGeometry, createNeonMaterial(0x00ff99, 0.1))
     const backEdges = new THREE.EdgesGeometry(backGeometry)
-    const backLine = new THREE.LineSegments(backEdges, createGlowingEdge(0x00ff99))
+    const backLineMaterial = createGlowingEdge(0x00ff99)
+    const backLine = new THREE.LineSegments(backEdges, backLineMaterial)
     backMesh.position.z = -cubeSize / 2
     backLine.position.z = -cubeSize / 2
     backMesh.rotation.y = Math.PI
     backLine.rotation.y = Math.PI
     scene.add(backMesh)
     scene.add(backLine)
+    edgeLinesRef.current.push(backLine)
 
     const centerSphere = new THREE.Mesh(
       new THREE.SphereGeometry(0.15, 32, 32),
@@ -235,6 +273,14 @@ export default function HolographicCube({
       if (controlsRef.current) {
         controlsRef.current.update()
       }
+
+      const time = performance.now() * 0.001
+      edgeLinesRef.current.forEach(line => {
+        const material = line.material as THREE.ShaderMaterial
+        if (material.uniforms && material.uniforms.time) {
+          material.uniforms.time.value = time
+        }
+      })
 
       const { leftOpen, rightOpen, topOpen, bottomOpen, animationSpeed } = animationStateRef.current
       const speed = animationSpeed / 100
