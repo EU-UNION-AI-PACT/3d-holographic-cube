@@ -279,6 +279,130 @@ export default function HolographicCube({
     sphereGlow.position.set(0, 0, 0)
     scene.add(sphereGlow)
 
+    const createGelatinBall = (position: THREE.Vector3, color: number) => {
+      const ballMaterial = new THREE.MeshPhysicalMaterial({
+        color: color,
+        emissive: color,
+        emissiveIntensity: 3,
+        transparent: true,
+        opacity: 0.8,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.1,
+        metalness: 0.2,
+        roughness: 0.1,
+        transmission: 0.6,
+        thickness: 0.5,
+        ior: 1.5
+      })
+      
+      const ball = new THREE.Mesh(
+        new THREE.SphereGeometry(0.12, 32, 32),
+        ballMaterial
+      )
+      ball.position.copy(position)
+      
+      const ballGlow = new THREE.PointLight(color, 2, 3)
+      ballGlow.position.copy(position)
+      
+      scene.add(ball)
+      scene.add(ballGlow)
+      
+      return ball
+    }
+
+    const getStarPoints = () => {
+      const outerRadius = 3
+      const points: THREE.Vector3[] = []
+      const starPoints = 5
+      
+      for (let i = 0; i < starPoints; i++) {
+        const angle = (i * 2 * Math.PI) / starPoints - Math.PI / 2
+        const x = Math.cos(angle) * outerRadius
+        const y = Math.sin(angle) * outerRadius
+        points.push(new THREE.Vector3(x, y, 0))
+      }
+      
+      return points
+    }
+
+    const createCrossLines = (points: THREE.Vector3[]) => {
+      const lineMaterial = new THREE.LineBasicMaterial({
+        color: 0x00ffff,
+        transparent: true,
+        opacity: 0.6,
+        linewidth: 2
+      })
+      
+      const lineGeometry = new THREE.BufferGeometry()
+      const linePositions: number[] = []
+      
+      for (let i = 0; i < points.length; i++) {
+        for (let j = i + 1; j < points.length; j++) {
+          if (i !== j && Math.abs(i - j) !== 1 && !(i === 0 && j === points.length - 1)) {
+            linePositions.push(points[i].x, points[i].y, points[i].z)
+            linePositions.push(points[j].x, points[j].y, points[j].z)
+          }
+        }
+      }
+      
+      lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3))
+      return new THREE.LineSegments(lineGeometry, lineMaterial)
+    }
+
+    const starPointsLocal = getStarPoints()
+
+    const leftStarPoints = starPointsLocal.map(p => {
+      const rotated = p.clone()
+      rotated.applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2)
+      rotated.x -= starSize / 2
+      return rotated
+    })
+    leftStarPoints.forEach(p => createGelatinBall(p, 0x00ffff))
+    scene.add(createCrossLines(leftStarPoints))
+
+    const rightStarPoints = starPointsLocal.map(p => {
+      const rotated = p.clone()
+      rotated.applyAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI / 2)
+      rotated.x += starSize / 2
+      return rotated
+    })
+    rightStarPoints.forEach(p => createGelatinBall(p, 0x00ffff))
+    scene.add(createCrossLines(rightStarPoints))
+
+    const topStarPoints = starPointsLocal.map(p => {
+      const rotated = p.clone()
+      rotated.applyAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2)
+      rotated.y += starSize / 2
+      return rotated
+    })
+    topStarPoints.forEach(p => createGelatinBall(p, 0xff00ff))
+    scene.add(createCrossLines(topStarPoints))
+
+    const bottomStarPoints = starPointsLocal.map(p => {
+      const rotated = p.clone()
+      rotated.applyAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2)
+      rotated.y -= starSize / 2
+      return rotated
+    })
+    bottomStarPoints.forEach(p => createGelatinBall(p, 0xff00ff))
+    scene.add(createCrossLines(bottomStarPoints))
+
+    const frontStarPoints = starPointsLocal.map(p => {
+      const translated = p.clone()
+      translated.z += starSize / 2
+      return translated
+    })
+    frontStarPoints.forEach(p => createGelatinBall(p, 0x00ff99))
+    scene.add(createCrossLines(frontStarPoints))
+
+    const backStarPoints = starPointsLocal.map(p => {
+      const translated = p.clone()
+      translated.z -= starSize / 2
+      return translated
+    })
+    backStarPoints.forEach(p => createGelatinBall(p, 0x00ff99))
+    scene.add(createCrossLines(backStarPoints))
+
     const particles = new THREE.Group()
     const particleGeometry = new THREE.SphereGeometry(0.02, 8, 8)
     const particleMaterial = new THREE.MeshBasicMaterial({
