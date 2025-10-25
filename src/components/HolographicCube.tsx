@@ -138,82 +138,105 @@ export default function HolographicCube({
       })
     }
 
-    const cubeSize = 3
+    const createStarShape = () => {
+      const shape = new THREE.Shape()
+      const outerRadius = 2
+      const innerRadius = outerRadius * 0.4
+      const points = 5
+      
+      for (let i = 0; i < points * 2; i++) {
+        const radius = i % 2 === 0 ? outerRadius : innerRadius
+        const angle = (i * Math.PI) / points - Math.PI / 2
+        const x = Math.cos(angle) * radius
+        const y = Math.sin(angle) * radius
+        
+        if (i === 0) {
+          shape.moveTo(x, y)
+        } else {
+          shape.lineTo(x, y)
+        }
+      }
+      shape.closePath()
+      return shape
+    }
+
+    const starShape = createStarShape()
+    const starSize = 3
 
     const leftGroup = new THREE.Group()
-    const leftGeometry = new THREE.PlaneGeometry(cubeSize, cubeSize)
+    const leftGeometry = new THREE.ShapeGeometry(starShape)
     const leftMesh = new THREE.Mesh(leftGeometry, createNeonMaterial(0x00ffff))
     const leftEdges = new THREE.EdgesGeometry(leftGeometry)
     const leftLineMaterial = createGlowingEdge(0x00ffff)
     const leftLine = new THREE.LineSegments(leftEdges, leftLineMaterial)
     leftGroup.add(leftMesh)
     leftGroup.add(leftLine)
-    leftGroup.position.x = -cubeSize / 2
+    leftGroup.position.x = -starSize / 2
     leftGroup.rotation.y = Math.PI / 2
     scene.add(leftGroup)
     panelsRef.current.left = leftGroup
     edgeLinesRef.current.push(leftLine)
 
     const rightGroup = new THREE.Group()
-    const rightGeometry = new THREE.PlaneGeometry(cubeSize, cubeSize)
+    const rightGeometry = new THREE.ShapeGeometry(starShape)
     const rightMesh = new THREE.Mesh(rightGeometry, createNeonMaterial(0x00ffff))
     const rightEdges = new THREE.EdgesGeometry(rightGeometry)
     const rightLineMaterial = createGlowingEdge(0x00ffff)
     const rightLine = new THREE.LineSegments(rightEdges, rightLineMaterial)
     rightGroup.add(rightMesh)
     rightGroup.add(rightLine)
-    rightGroup.position.x = cubeSize / 2
+    rightGroup.position.x = starSize / 2
     rightGroup.rotation.y = -Math.PI / 2
     scene.add(rightGroup)
     panelsRef.current.right = rightGroup
     edgeLinesRef.current.push(rightLine)
 
     const topGroup = new THREE.Group()
-    const topGeometry = new THREE.PlaneGeometry(cubeSize, cubeSize)
+    const topGeometry = new THREE.ShapeGeometry(starShape)
     const topMesh = new THREE.Mesh(topGeometry, createNeonMaterial(0xff00ff))
     const topEdges = new THREE.EdgesGeometry(topGeometry)
     const topLineMaterial = createGlowingEdge(0xff00ff)
     const topLine = new THREE.LineSegments(topEdges, topLineMaterial)
     topGroup.add(topMesh)
     topGroup.add(topLine)
-    topGroup.position.y = cubeSize / 2
+    topGroup.position.y = starSize / 2
     topGroup.rotation.x = -Math.PI / 2
     scene.add(topGroup)
     panelsRef.current.top = topGroup
     edgeLinesRef.current.push(topLine)
 
     const bottomGroup = new THREE.Group()
-    const bottomGeometry = new THREE.PlaneGeometry(cubeSize, cubeSize)
+    const bottomGeometry = new THREE.ShapeGeometry(starShape)
     const bottomMesh = new THREE.Mesh(bottomGeometry, createNeonMaterial(0xff00ff))
     const bottomEdges = new THREE.EdgesGeometry(bottomGeometry)
     const bottomLineMaterial = createGlowingEdge(0xff00ff)
     const bottomLine = new THREE.LineSegments(bottomEdges, bottomLineMaterial)
     bottomGroup.add(bottomMesh)
     bottomGroup.add(bottomLine)
-    bottomGroup.position.y = -cubeSize / 2
+    bottomGroup.position.y = -starSize / 2
     bottomGroup.rotation.x = Math.PI / 2
     scene.add(bottomGroup)
     panelsRef.current.bottom = bottomGroup
     edgeLinesRef.current.push(bottomLine)
 
-    const frontGeometry = new THREE.PlaneGeometry(cubeSize, cubeSize)
+    const frontGeometry = new THREE.ShapeGeometry(starShape)
     const frontMesh = new THREE.Mesh(frontGeometry, createNeonMaterial(0x00ff99, 0.1))
     const frontEdges = new THREE.EdgesGeometry(frontGeometry)
     const frontLineMaterial = createGlowingEdge(0x00ff99)
     const frontLine = new THREE.LineSegments(frontEdges, frontLineMaterial)
-    frontMesh.position.z = cubeSize / 2
-    frontLine.position.z = cubeSize / 2
+    frontMesh.position.z = starSize / 2
+    frontLine.position.z = starSize / 2
     scene.add(frontMesh)
     scene.add(frontLine)
     edgeLinesRef.current.push(frontLine)
 
-    const backGeometry = new THREE.PlaneGeometry(cubeSize, cubeSize)
+    const backGeometry = new THREE.ShapeGeometry(starShape)
     const backMesh = new THREE.Mesh(backGeometry, createNeonMaterial(0x00ff99, 0.1))
     const backEdges = new THREE.EdgesGeometry(backGeometry)
     const backLineMaterial = createGlowingEdge(0x00ff99)
     const backLine = new THREE.LineSegments(backEdges, backLineMaterial)
-    backMesh.position.z = -cubeSize / 2
-    backLine.position.z = -cubeSize / 2
+    backMesh.position.z = -starSize / 2
+    backLine.position.z = -starSize / 2
     backMesh.rotation.y = Math.PI
     backLine.rotation.y = Math.PI
     scene.add(backMesh)

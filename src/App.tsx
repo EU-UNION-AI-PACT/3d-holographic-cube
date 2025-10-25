@@ -16,7 +16,7 @@ import {
   Play,
   Pause,
   Certificate,
-  Cube
+  Star
 } from '@phosphor-icons/react'
 
 function App() {
@@ -108,7 +108,7 @@ function App() {
 
       <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
         <h1 className="text-4xl font-bold neon-glow text-center tracking-tight">
-          {showCertificate ? 'EU-UNION CERTIFICATE' : 'HOLOGRAPHIC CUBE'}
+          {showCertificate ? 'EU-UNION CERTIFICATE' : 'HOLOGRAPHIC STAR'}
         </h1>
       </div>
 
@@ -119,7 +119,7 @@ function App() {
           size="icon"
           className="bg-card/80 backdrop-blur-md border-primary/30"
         >
-          {showCertificate ? <Cube weight="bold" /> : <Certificate weight="bold" />}
+          {showCertificate ? <Star weight="bold" /> : <Certificate weight="bold" />}
         </Button>
       </div>
 
@@ -256,8 +256,8 @@ function App() {
                 variant="outline"
                 className="w-full"
               >
-                <Cube weight="bold" className="mr-2" />
-                Back to Cube
+                <Star weight="bold" className="mr-2" />
+                Back to Star
               </Button>
             </div>
           )}
