@@ -616,11 +616,11 @@ export default function HolographicCube({
       return raysGroup
     }
     
-      lampGroup.add(prismaticRays)
-      scene.add(lampGroup)
-    }
-    }
-    const createGelatinBall = (position: THREE.Vector3, color: number) => {
+    const prismaticRays = createPrismaticRays()
+    lampGroup.add(prismaticRays)
+    scene.add(lampGroup)
+  }
+
     const createGelatinBall = (position: THREE.Vector3, color: number) => {
       const ballMaterial = new THREE.MeshPhysicalMaterial({
         color: color,
