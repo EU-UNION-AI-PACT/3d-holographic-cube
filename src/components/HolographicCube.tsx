@@ -140,7 +140,7 @@ export default function HolographicCube({
 
     const createStarShape = () => {
       const shape = new THREE.Shape()
-      const outerRadius = 2
+      const outerRadius = 3
       const innerRadius = outerRadius * 0.4
       const points = 5
       
@@ -161,7 +161,7 @@ export default function HolographicCube({
     }
 
     const starShape = createStarShape()
-    const starSize = 3
+    const starSize = 4.5
 
     const leftGroup = new THREE.Group()
     const leftGeometry = new THREE.ShapeGeometry(starShape)
