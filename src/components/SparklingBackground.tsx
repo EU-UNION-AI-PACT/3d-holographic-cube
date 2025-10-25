@@ -49,14 +49,49 @@ export default function SparklingBackground() {
       shootingStars.push(star)
     }
 
-    const drawGradientBackground = () => {
-      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
-      gradient.addColorStop(0, 'oklch(0.25 0.15 280)')
-      gradient.addColorStop(0.5, 'oklch(0.20 0.18 270)')
-      gradient.addColorStop(1, 'oklch(0.15 0.12 260)')
+    const stars: { x: number; y: number; size: number; brightness: number; twinkle: number }[] = []
+    for (let i = 0; i < 200; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 1.5 + 0.5,
+        brightness: Math.random(),
+        twinkle: Math.random() * Math.PI * 2
+      })
+    }
+
+    const drawGradientBackground = (time: number) => {
+      const gradient = ctx.createRadialGradient(
+        canvas.width / 2, 
+        canvas.height / 2, 
+        0,
+        canvas.width / 2,
+        canvas.height / 2,
+        canvas.width * 0.8
+      )
+      gradient.addColorStop(0, 'oklch(0.08 0.05 260)')
+      gradient.addColorStop(0.5, 'oklch(0.05 0.08 265)')
+      gradient.addColorStop(1, 'oklch(0.02 0.03 270)')
       
       ctx.fillStyle = gradient
       ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+      stars.forEach(star => {
+        const twinkle = (Math.sin(time * 2 + star.twinkle) + 1) / 2
+        const brightness = star.brightness * twinkle
+        
+        ctx.fillStyle = `rgba(255, 255, 255, ${brightness * 0.8})`
+        ctx.beginPath()
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2)
+        ctx.fill()
+
+        if (star.size > 1) {
+          ctx.fillStyle = `rgba(200, 220, 255, ${brightness * 0.4})`
+          ctx.beginPath()
+          ctx.arc(star.x, star.y, star.size * 1.8, 0, Math.PI * 2)
+          ctx.fill()
+        }
+      })
     }
 
     const drawShootingStar = (star: ShootingStar) => {
@@ -118,9 +153,11 @@ export default function SparklingBackground() {
     }
 
     let animationId: number
+    let startTime = performance.now()
 
     const animate = () => {
-      drawGradientBackground()
+      const currentTime = (performance.now() - startTime) * 0.001
+      drawGradientBackground(currentTime)
 
       shootingStars.forEach((star, index) => {
         star.trail.unshift({ x: star.x, y: star.y, opacity: star.opacity })

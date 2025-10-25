@@ -138,7 +138,7 @@ function App() {
 
       <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
         <h1 className="text-3xl md:text-4xl font-bold neon-glow text-center tracking-tight px-4 transition-all duration-500">
-          {showOwnage ? 'WO OWND DER?' : showCertificate ? 'EU-UNION CERTIFICATE' : 'HOLOGRAPHIC STAR'}
+          {showOwnage ? 'WO OWND DER?' : showCertificate ? 'EU-UNION CERTIFICATE' : 'COSMIC STAR'}
         </h1>
       </div>
 

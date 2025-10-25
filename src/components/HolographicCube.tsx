@@ -86,37 +86,33 @@ export default function HolographicCube({
     controls.autoRotateSpeed = 0.5
     controlsRef.current = controls
 
-    const ambientLight = new THREE.AmbientLight(0x00ffff, 1.5)
+    const ambientLight = new THREE.AmbientLight(0x8899ff, 0.4)
     scene.add(ambientLight)
 
-    const pointLight1 = new THREE.PointLight(0x00ffff, 3, 100)
-    pointLight1.position.set(5, 5, 5)
-    scene.add(pointLight1)
+    const mainLight = new THREE.DirectionalLight(0xffffff, 1.2)
+    mainLight.position.set(10, 10, 10)
+    scene.add(mainLight)
 
-    const pointLight2 = new THREE.PointLight(0xff00ff, 3, 100)
-    pointLight2.position.set(-5, -5, 5)
-    scene.add(pointLight2)
+    const rimLight1 = new THREE.PointLight(0x4488ff, 0.8, 50)
+    rimLight1.position.set(-8, 3, -5)
+    scene.add(rimLight1)
 
-    const pointLight3 = new THREE.PointLight(0x00ff99, 2.5, 100)
-    pointLight3.position.set(0, 5, -5)
-    scene.add(pointLight3)
+    const rimLight2 = new THREE.PointLight(0x88aaff, 0.6, 50)
+    rimLight2.position.set(8, -3, 5)
+    scene.add(rimLight2)
 
-    const pointLight4 = new THREE.PointLight(0xffff00, 2.5, 100)
-    pointLight4.position.set(0, -5, 5)
-    scene.add(pointLight4)
-
-    const createNeonMaterial = (color: number, opacity: number = 0.25) => {
+    const createRealisticMaterial = (color: number, opacity: number = 0.35) => {
       return new THREE.MeshPhysicalMaterial({
         color: color,
         transparent: true,
         opacity: opacity,
-        metalness: 0.5,
-        roughness: 0.05,
+        metalness: 0.95,
+        roughness: 0.15,
         clearcoat: 1.0,
-        clearcoatRoughness: 0.05,
+        clearcoatRoughness: 0.1,
         side: THREE.DoubleSide,
-        emissive: color,
-        emissiveIntensity: 2.5
+        reflectivity: 1,
+        envMapIntensity: 1.2
       })
     }
 
@@ -201,7 +197,7 @@ export default function HolographicCube({
 
     const leftGroup = new THREE.Group()
     const leftGeometry = new THREE.ShapeGeometry(starShape)
-    const leftMesh = new THREE.Mesh(leftGeometry, createNeonMaterial(0x00ffff))
+    const leftMesh = new THREE.Mesh(leftGeometry, createRealisticMaterial(0xaaccff))
     const leftEdges = new THREE.EdgesGeometry(leftGeometry)
     const leftLineMaterial = createGlowingEdge()
     const leftLine = new THREE.LineSegments(leftEdges, leftLineMaterial)
@@ -215,7 +211,7 @@ export default function HolographicCube({
 
     const rightGroup = new THREE.Group()
     const rightGeometry = new THREE.ShapeGeometry(starShape)
-    const rightMesh = new THREE.Mesh(rightGeometry, createNeonMaterial(0x00ffff))
+    const rightMesh = new THREE.Mesh(rightGeometry, createRealisticMaterial(0xaaccff))
     const rightEdges = new THREE.EdgesGeometry(rightGeometry)
     const rightLineMaterial = createGlowingEdge()
     const rightLine = new THREE.LineSegments(rightEdges, rightLineMaterial)
@@ -229,7 +225,7 @@ export default function HolographicCube({
 
     const topGroup = new THREE.Group()
     const topGeometry = new THREE.ShapeGeometry(starShape)
-    const topMesh = new THREE.Mesh(topGeometry, createNeonMaterial(0xff00ff))
+    const topMesh = new THREE.Mesh(topGeometry, createRealisticMaterial(0xccddff))
     const topEdges = new THREE.EdgesGeometry(topGeometry)
     const topLineMaterial = createGlowingEdge()
     const topLine = new THREE.LineSegments(topEdges, topLineMaterial)
@@ -243,7 +239,7 @@ export default function HolographicCube({
 
     const bottomGroup = new THREE.Group()
     const bottomGeometry = new THREE.ShapeGeometry(starShape)
-    const bottomMesh = new THREE.Mesh(bottomGeometry, createNeonMaterial(0xff00ff))
+    const bottomMesh = new THREE.Mesh(bottomGeometry, createRealisticMaterial(0xccddff))
     const bottomEdges = new THREE.EdgesGeometry(bottomGeometry)
     const bottomLineMaterial = createGlowingEdge()
     const bottomLine = new THREE.LineSegments(bottomEdges, bottomLineMaterial)
@@ -256,7 +252,7 @@ export default function HolographicCube({
     edgeLinesRef.current.push(bottomLine)
 
     const frontGeometry = new THREE.ShapeGeometry(starShape)
-    const frontMesh = new THREE.Mesh(frontGeometry, createNeonMaterial(0x00ff99, 0.1))
+    const frontMesh = new THREE.Mesh(frontGeometry, createRealisticMaterial(0xbbeeff, 0.25))
     const frontEdges = new THREE.EdgesGeometry(frontGeometry)
     const frontLineMaterial = createGlowingEdge()
     const frontLine = new THREE.LineSegments(frontEdges, frontLineMaterial)
@@ -267,7 +263,7 @@ export default function HolographicCube({
     edgeLinesRef.current.push(frontLine)
 
     const backGeometry = new THREE.ShapeGeometry(starShape)
-    const backMesh = new THREE.Mesh(backGeometry, createNeonMaterial(0x00ff99, 0.1))
+    const backMesh = new THREE.Mesh(backGeometry, createRealisticMaterial(0xbbeeff, 0.25))
     const backEdges = new THREE.EdgesGeometry(backGeometry)
     const backLineMaterial = createGlowingEdge()
     const backLine = new THREE.LineSegments(backEdges, backLineMaterial)
@@ -615,17 +611,13 @@ export default function HolographicCube({
     const createGelatinBall = (position: THREE.Vector3, color: number) => {
       const ballMaterial = new THREE.MeshPhysicalMaterial({
         color: color,
-        emissive: color,
-        emissiveIntensity: 3,
         transparent: true,
-        opacity: 0.8,
+        opacity: 0.9,
         clearcoat: 1.0,
-        clearcoatRoughness: 0.1,
-        metalness: 0.2,
+        clearcoatRoughness: 0.05,
+        metalness: 0.9,
         roughness: 0.1,
-        transmission: 0.6,
-        thickness: 0.5,
-        ior: 1.5
+        reflectivity: 1
       })
       
       const ball = new THREE.Mesh(
@@ -634,11 +626,7 @@ export default function HolographicCube({
       )
       ball.position.copy(position)
       
-      const ballGlow = new THREE.PointLight(color, 2, 3)
-      ballGlow.position.copy(position)
-      
       scene.add(ball)
-      scene.add(ballGlow)
       
       return ball
     }
@@ -660,10 +648,10 @@ export default function HolographicCube({
 
     const createCrossLines = (points: THREE.Vector3[]) => {
       const lineMaterial = new THREE.LineBasicMaterial({
-        color: 0x00ffff,
+        color: 0xccddff,
         transparent: true,
-        opacity: 0.6,
-        linewidth: 2
+        opacity: 0.4,
+        linewidth: 1
       })
       
       const lineGeometry = new THREE.BufferGeometry()
@@ -690,7 +678,7 @@ export default function HolographicCube({
       rotated.x -= starSize / 2
       return rotated
     })
-    leftStarPoints.forEach(p => createGelatinBall(p, 0x00ffff))
+    leftStarPoints.forEach(p => createGelatinBall(p, 0xaaccff))
     scene.add(createCrossLines(leftStarPoints))
 
     const rightStarPoints = starPointsLocal.map(p => {
@@ -699,7 +687,7 @@ export default function HolographicCube({
       rotated.x += starSize / 2
       return rotated
     })
-    rightStarPoints.forEach(p => createGelatinBall(p, 0x00ffff))
+    rightStarPoints.forEach(p => createGelatinBall(p, 0xaaccff))
     scene.add(createCrossLines(rightStarPoints))
 
     const topStarPoints = starPointsLocal.map(p => {
@@ -708,7 +696,7 @@ export default function HolographicCube({
       rotated.y += starSize / 2
       return rotated
     })
-    topStarPoints.forEach(p => createGelatinBall(p, 0xff00ff))
+    topStarPoints.forEach(p => createGelatinBall(p, 0xccddff))
     scene.add(createCrossLines(topStarPoints))
 
     const bottomStarPoints = starPointsLocal.map(p => {
@@ -717,7 +705,7 @@ export default function HolographicCube({
       rotated.y -= starSize / 2
       return rotated
     })
-    bottomStarPoints.forEach(p => createGelatinBall(p, 0xff00ff))
+    bottomStarPoints.forEach(p => createGelatinBall(p, 0xccddff))
     scene.add(createCrossLines(bottomStarPoints))
 
     const frontStarPoints = starPointsLocal.map(p => {
@@ -725,7 +713,7 @@ export default function HolographicCube({
       translated.z += starSize / 2
       return translated
     })
-    frontStarPoints.forEach(p => createGelatinBall(p, 0x00ff99))
+    frontStarPoints.forEach(p => createGelatinBall(p, 0xbbeeff))
     scene.add(createCrossLines(frontStarPoints))
 
     const backStarPoints = starPointsLocal.map(p => {
@@ -733,23 +721,23 @@ export default function HolographicCube({
       translated.z -= starSize / 2
       return translated
     })
-    backStarPoints.forEach(p => createGelatinBall(p, 0x00ff99))
+    backStarPoints.forEach(p => createGelatinBall(p, 0xbbeeff))
     scene.add(createCrossLines(backStarPoints))
 
     const particles = new THREE.Group()
-    const particleGeometry = new THREE.SphereGeometry(0.02, 8, 8)
+    const particleGeometry = new THREE.SphereGeometry(0.015, 6, 6)
     const particleMaterial = new THREE.MeshBasicMaterial({
-      color: 0x00ffff,
+      color: 0xaaccff,
       transparent: true,
-      opacity: 0.6
+      opacity: 0.3
     })
 
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 30; i++) {
       const particle = new THREE.Mesh(particleGeometry, particleMaterial)
       particle.position.set(
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 10
+        (Math.random() - 0.5) * 12,
+        (Math.random() - 0.5) * 12,
+        (Math.random() - 0.5) * 12
       )
       particles.add(particle)
     }
