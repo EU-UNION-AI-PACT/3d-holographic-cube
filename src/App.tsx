@@ -20,44 +20,23 @@ import {
 } from '@phosphor-icons/react'
 
 function App() {
-  const [leftOpen, setLeftOpen] = useKV<number>('panel-left', 0)
-  const [rightOpen, setRightOpen] = useKV<number>('panel-right', 0)
-  const [topOpen, setTopOpen] = useKV<number>('panel-top', 0)
-  const [bottomOpen, setBottomOpen] = useKV<number>('panel-bottom', 0)
+  const [activePanel, setActivePanel] = useKV<string | null>('active-panel', null)
   const [autoRotate, setAutoRotate] = useKV<boolean>('auto-rotate', true)
   const [animationSpeed, setAnimationSpeed] = useKV<number>('animation-speed', 5)
   const [isAnimating, setIsAnimating] = useState(false)
   const [showCertificate, setShowCertificate] = useKV<boolean>('show-certificate', false)
 
-  const togglePanel = (panel: 'left' | 'right' | 'top' | 'bottom') => {
-    const setters = {
-      left: setLeftOpen,
-      right: setRightOpen,
-      top: setTopOpen,
-      bottom: setBottomOpen
-    }
-    const values = {
-      left: leftOpen,
-      right: rightOpen,
-      top: topOpen,
-      bottom: bottomOpen
-    }
-    
-    setters[panel]((current: number) => current === 0 ? 1 : 0)
-  }
+  const leftOpen = activePanel === 'left' ? 1 : 0
+  const rightOpen = activePanel === 'right' ? 1 : 0
+  const topOpen = activePanel === 'top' ? 1 : 0
+  const bottomOpen = activePanel === 'bottom' ? 1 : 0
 
-  const openAll = () => {
-    setLeftOpen(1)
-    setRightOpen(1)
-    setTopOpen(1)
-    setBottomOpen(1)
+  const togglePanel = (panel: 'left' | 'right' | 'top' | 'bottom') => {
+    setActivePanel((current) => current === panel ? null : panel)
   }
 
   const closeAll = () => {
-    setLeftOpen(0)
-    setRightOpen(0)
-    setTopOpen(0)
-    setBottomOpen(0)
+    setActivePanel(null)
   }
 
   const reset = () => {
@@ -70,19 +49,19 @@ function App() {
     if (isAnimating) return
     
     setIsAnimating(true)
-    closeAll()
+    setActivePanel(null)
     
     await new Promise(resolve => setTimeout(resolve, 500))
-    setLeftOpen(1)
-    await new Promise(resolve => setTimeout(resolve, 300))
-    setRightOpen(1)
-    await new Promise(resolve => setTimeout(resolve, 300))
-    setTopOpen(1)
-    await new Promise(resolve => setTimeout(resolve, 300))
-    setBottomOpen(1)
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    setActivePanel('left')
+    await new Promise(resolve => setTimeout(resolve, 800))
+    setActivePanel('right')
+    await new Promise(resolve => setTimeout(resolve, 800))
+    setActivePanel('top')
+    await new Promise(resolve => setTimeout(resolve, 800))
+    setActivePanel('bottom')
+    await new Promise(resolve => setTimeout(resolve, 800))
     
-    closeAll()
+    setActivePanel(null)
     await new Promise(resolve => setTimeout(resolve, 500))
     setIsAnimating(false)
   }
@@ -91,12 +70,13 @@ function App() {
     <div className="relative w-full h-screen overflow-hidden bg-background">
       {!showCertificate && (
         <HolographicCube
-          leftOpen={leftOpen ?? 0}
-          rightOpen={rightOpen ?? 0}
-          topOpen={topOpen ?? 0}
-          bottomOpen={bottomOpen ?? 0}
+          leftOpen={leftOpen}
+          rightOpen={rightOpen}
+          topOpen={topOpen}
+          bottomOpen={bottomOpen}
           autoRotate={autoRotate ?? true}
           animationSpeed={animationSpeed ?? 5}
+          activePanel={activePanel}
         />
       )}
 
@@ -132,20 +112,20 @@ function App() {
                 <div className="grid grid-cols-3 gap-2">
                   <div />
                   <Button
-                    variant={(topOpen ?? 0) > 0 ? 'default' : 'outline'}
+                    variant={activePanel === 'top' ? 'default' : 'outline'}
                     size="icon"
                     onClick={() => togglePanel('top')}
-                    className={(topOpen ?? 0) > 0 ? 'bg-accent hover:bg-accent/90' : ''}
+                    className={activePanel === 'top' ? 'bg-accent hover:bg-accent/90' : ''}
                   >
                     <CaretUp weight="bold" />
                   </Button>
                   <div />
                   
                   <Button
-                    variant={(leftOpen ?? 0) > 0 ? 'default' : 'outline'}
+                    variant={activePanel === 'left' ? 'default' : 'outline'}
                     size="icon"
                     onClick={() => togglePanel('left')}
-                    className={(leftOpen ?? 0) > 0 ? 'bg-accent hover:bg-accent/90' : ''}
+                    className={activePanel === 'left' ? 'bg-accent hover:bg-accent/90' : ''}
                   >
                     <CaretLeft weight="bold" />
                   </Button>
@@ -153,20 +133,20 @@ function App() {
                     <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
                   </div>
                   <Button
-                    variant={(rightOpen ?? 0) > 0 ? 'default' : 'outline'}
+                    variant={activePanel === 'right' ? 'default' : 'outline'}
                     size="icon"
                     onClick={() => togglePanel('right')}
-                    className={(rightOpen ?? 0) > 0 ? 'bg-accent hover:bg-accent/90' : ''}
+                    className={activePanel === 'right' ? 'bg-accent hover:bg-accent/90' : ''}
                   >
                     <CaretRight weight="bold" />
                   </Button>
                   
                   <div />
                   <Button
-                    variant={(bottomOpen ?? 0) > 0 ? 'default' : 'outline'}
+                    variant={activePanel === 'bottom' ? 'default' : 'outline'}
                     size="icon"
                     onClick={() => togglePanel('bottom')}
-                    className={(bottomOpen ?? 0) > 0 ? 'bg-accent hover:bg-accent/90' : ''}
+                    className={activePanel === 'bottom' ? 'bg-accent hover:bg-accent/90' : ''}
                   >
                     <CaretDown weight="bold" />
                   </Button>
@@ -176,17 +156,9 @@ function App() {
 
               <div className="flex gap-2">
                 <Button 
-                  onClick={openAll} 
-                  variant="secondary" 
-                  className="flex-1"
-                  size="sm"
-                >
-                  Open All
-                </Button>
-                <Button 
                   onClick={closeAll} 
                   variant="secondary" 
-                  className="flex-1"
+                  className="w-full"
                   size="sm"
                 >
                   Close All

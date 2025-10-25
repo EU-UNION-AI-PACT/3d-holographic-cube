@@ -9,6 +9,7 @@ interface HolographicCubeProps {
   bottomOpen: number
   autoRotate: boolean
   animationSpeed: number
+  activePanel?: string | null
 }
 
 const GOLDEN_RATIO = 1.618033988749
@@ -19,7 +20,8 @@ export default function HolographicCube({
   topOpen,
   bottomOpen,
   autoRotate,
-  animationSpeed
+  animationSpeed,
+  activePanel
 }: HolographicCubeProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<THREE.Scene | null>(null)
@@ -34,6 +36,9 @@ export default function HolographicCube({
   }>({ left: null, right: null, top: null, bottom: null })
   const edgeLinesRef = useRef<THREE.LineSegments[]>([])
   const animationStateRef = useRef({ leftOpen, rightOpen, topOpen, bottomOpen, animationSpeed })
+  const defaultCameraPosition = useRef({ x: 2, y: 2, z: 5 })
+  const targetCameraPosition = useRef({ x: 2, y: 2, z: 5 })
+  const targetCameraTarget = useRef({ x: 0, y: 0, z: 0 })
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -51,6 +56,8 @@ export default function HolographicCube({
     camera.position.y = 2
     camera.position.x = 2
     cameraRef.current = camera
+    
+    defaultCameraPosition.current = { x: 2, y: 2, z: 5 }
 
     const renderer = new THREE.WebGLRenderer({ 
       antialias: true, 
@@ -452,6 +459,41 @@ export default function HolographicCube({
       const { leftOpen, rightOpen, topOpen, bottomOpen, animationSpeed } = animationStateRef.current
       const speed = animationSpeed / 100
 
+      if (cameraRef.current && controlsRef.current) {
+        const lerpSpeed = 0.05
+        cameraRef.current.position.x = THREE.MathUtils.lerp(
+          cameraRef.current.position.x,
+          targetCameraPosition.current.x,
+          lerpSpeed
+        )
+        cameraRef.current.position.y = THREE.MathUtils.lerp(
+          cameraRef.current.position.y,
+          targetCameraPosition.current.y,
+          lerpSpeed
+        )
+        cameraRef.current.position.z = THREE.MathUtils.lerp(
+          cameraRef.current.position.z,
+          targetCameraPosition.current.z,
+          lerpSpeed
+        )
+        
+        controlsRef.current.target.x = THREE.MathUtils.lerp(
+          controlsRef.current.target.x,
+          targetCameraTarget.current.x,
+          lerpSpeed
+        )
+        controlsRef.current.target.y = THREE.MathUtils.lerp(
+          controlsRef.current.target.y,
+          targetCameraTarget.current.y,
+          lerpSpeed
+        )
+        controlsRef.current.target.z = THREE.MathUtils.lerp(
+          controlsRef.current.target.z,
+          targetCameraTarget.current.z,
+          lerpSpeed
+        )
+      }
+
       if (panelsRef.current.left) {
         const targetRotation = leftOpen * Math.PI / 2
         panelsRef.current.left.rotation.y = THREE.MathUtils.lerp(
@@ -522,6 +564,37 @@ export default function HolographicCube({
   useEffect(() => {
     animationStateRef.current = { leftOpen, rightOpen, topOpen, bottomOpen, animationSpeed }
   }, [leftOpen, rightOpen, topOpen, bottomOpen, animationSpeed])
+
+  useEffect(() => {
+    const distance = 6
+    
+    switch (activePanel) {
+      case 'left':
+        targetCameraPosition.current = { x: -distance, y: 0, z: 0 }
+        targetCameraTarget.current = { x: -2.25, y: 0, z: 0 }
+        if (controlsRef.current) controlsRef.current.autoRotate = false
+        break
+      case 'right':
+        targetCameraPosition.current = { x: distance, y: 0, z: 0 }
+        targetCameraTarget.current = { x: 2.25, y: 0, z: 0 }
+        if (controlsRef.current) controlsRef.current.autoRotate = false
+        break
+      case 'top':
+        targetCameraPosition.current = { x: 0, y: distance, z: 0 }
+        targetCameraTarget.current = { x: 0, y: 2.25, z: 0 }
+        if (controlsRef.current) controlsRef.current.autoRotate = false
+        break
+      case 'bottom':
+        targetCameraPosition.current = { x: 0, y: -distance, z: 0 }
+        targetCameraTarget.current = { x: 0, y: -2.25, z: 0 }
+        if (controlsRef.current) controlsRef.current.autoRotate = false
+        break
+      default:
+        targetCameraPosition.current = defaultCameraPosition.current
+        targetCameraTarget.current = { x: 0, y: 0, z: 0 }
+        if (controlsRef.current) controlsRef.current.autoRotate = autoRotate
+    }
+  }, [activePanel, autoRotate])
 
   return (
     <div 
