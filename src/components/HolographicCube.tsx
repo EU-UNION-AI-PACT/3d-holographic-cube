@@ -605,13 +605,9 @@ export default function HolographicCube({
         
         ray.position.y = 0.275
         ray.rotation.z = Math.PI
-        
+        ray.position.x = directionX * 0.15
         const directionX = Math.cos(baseAngle)
         const directionZ = Math.sin(baseAngle)
-        
-        ray.position.x = directionX * 0.15
-        ray.position.z = directionZ * 0.15
-        
         raysGroup.add(ray)
         prismaticRaysRef.current.push(ray)
       }
@@ -621,18 +617,18 @@ export default function HolographicCube({
     
     const prismaticRays = createPrismaticRays()
     lampGroup.add(prismaticRays)
-    
+    }
     scene.add(lampGroup)
 
     const createGelatinBall = (position: THREE.Vector3, color: number) => {
       const ballMaterial = new THREE.MeshPhysicalMaterial({
+    scene.add(lampGroup)
+
+    const createGelatinBall = (position: THREE.Vector3, color: number) => {
+        clearcoat: 1.0,
         color: color,
         transparent: true,
         opacity: 0.9,
-        clearcoat: 1.0,
-        clearcoatRoughness: 0.05,
-        metalness: 0.9,
-        roughness: 0.1,
         reflectivity: 1
       })
       
