@@ -19,8 +19,8 @@ export default function CertificatePage() {
 
   return (
     <div className="relative w-full min-h-screen overflow-x-hidden overflow-y-auto bg-transparent">
-      <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
-        <Card className="cert-card bg-card/80 backdrop-blur-md border-primary/30 shadow-2xl">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        <Card className="cert-card bg-card/80 backdrop-blur-md border-primary/30 shadow-2xl hover:shadow-primary/10 transition-all duration-300">
           <div className="p-6 border-b border-primary/20 bg-gradient-to-r from-primary/10 to-accent/10">
             <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               Certificate of Recognition
@@ -33,13 +33,13 @@ export default function CertificatePage() {
           </div>
           <div className="p-6 space-y-4">
             <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 rounded-full bg-primary/20 border border-primary/40 text-xs font-semibold">
+              <span className="px-3 py-1 rounded-full bg-primary/20 border border-primary/40 text-xs font-semibold transition-all duration-200 hover:bg-primary/30 hover:scale-105">
                 European Commission
               </span>
-              <span className="px-3 py-1 rounded-full bg-primary/20 border border-primary/40 text-xs font-semibold">
+              <span className="px-3 py-1 rounded-full bg-primary/20 border border-primary/40 text-xs font-semibold transition-all duration-200 hover:bg-primary/30 hover:scale-105">
                 Detmold · Nordrhein-Westfalen · Deutschland
               </span>
-              <span className="px-3 py-1 rounded-full bg-accent/20 border border-accent/40 text-xs font-semibold">
+              <span className="px-3 py-1 rounded-full bg-accent/20 border border-accent/40 text-xs font-semibold transition-all duration-200 hover:bg-accent/30 hover:scale-105">
                 EU-UNION Expert · Verifiziert
               </span>
             </div>
@@ -54,7 +54,7 @@ export default function CertificatePage() {
           </div>
         </Card>
 
-        <Card className="cert-card bg-card/80 backdrop-blur-md border-primary/30 shadow-2xl">
+        <Card className="cert-card bg-card/80 backdrop-blur-md border-primary/30 shadow-2xl hover:shadow-primary/10 transition-all duration-300">
           <div className="p-6 border-b border-primary/20 bg-gradient-to-r from-primary/10 to-accent/10">
             <h2 className="text-2xl font-bold">🕊️ EU-UNION-COMMISSION | CERTIFICATE OF RECOGNITION</h2>
             <div className="text-sm text-muted-foreground mt-2">
@@ -108,7 +108,7 @@ export default function CertificatePage() {
                   href="https://europea-un-world-lfx-peace-eu-gov-int.netlify.app/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-primary hover:text-accent transition-colors break-all"
+                  className="text-primary hover:text-accent transition-all duration-200 break-all hover:underline"
                 >
                   europea-un-world-lfx-peace-eu-gov-int.netlify.app
                 </a>
@@ -123,7 +123,7 @@ export default function CertificatePage() {
           </div>
         </Card>
 
-        <Card className="cert-card bg-card/80 backdrop-blur-md border-primary/30 shadow-2xl">
+        <Card className="cert-card bg-card/80 backdrop-blur-md border-primary/30 shadow-2xl hover:shadow-primary/10 transition-all duration-300">
           <div className="p-6 border-b border-primary/20 bg-gradient-to-r from-primary/10 to-accent/10">
             <h2 className="text-2xl font-bold">🌟 Die Daniel Pohl Chronicles 🌟</h2>
             <div className="text-sm text-muted-foreground mt-2 italic">
@@ -135,7 +135,7 @@ export default function CertificatePage() {
               Referenznummer: <span className="text-accent">EX2025D1218310</span> | D-U-N-S Nummer: 315676980
             </p>
             
-            <div className="p-4 bg-primary/10 border-l-4 border-primary rounded">
+            <div className="p-4 bg-primary/10 border-l-4 border-primary rounded transition-all duration-200 hover:bg-primary/15">
               <h4 className="font-semibold text-lg mb-2">📍 Die Ursprungsgeschichte</h4>
               <p>
                 Geboren am 6. Januar 1988 in Lippstadt - dem Dreikönigstag, ein Zeichen des Schicksals 
@@ -144,7 +144,7 @@ export default function CertificatePage() {
               </p>
             </div>
 
-            <div className="p-4 bg-accent/10 border-l-4 border-accent rounded">
+            <div className="p-4 bg-accent/10 border-l-4 border-accent rounded transition-all duration-200 hover:bg-accent/15">
               <h4 className="font-semibold text-lg mb-2">✨ Spirituelle Wurzeln & Berufung</h4>
               <p className="italic mb-3">
                 Ich stehe in der Linie der Heiligen Drei Könige, des Sankt Patrick und des 
@@ -158,7 +158,7 @@ export default function CertificatePage() {
               </p>
             </div>
 
-            <div className="p-4 bg-primary/10 border-l-4 border-primary rounded">
+            <div className="p-4 bg-primary/10 border-l-4 border-primary rounded transition-all duration-200 hover:bg-primary/15">
               <h4 className="font-semibold text-lg mb-2">🚀 Die Mission: Back2Future - Back2Reality</h4>
               <p className="mb-3">
                 Meine Arbeit steht unter dem Zeichen von{' '}
@@ -174,7 +174,7 @@ export default function CertificatePage() {
               </ul>
             </div>
 
-            <div className="text-center p-6 bg-gradient-to-br from-accent/20 to-primary/20 rounded-lg border-2 border-accent/40">
+            <div className="text-center p-6 bg-gradient-to-br from-accent/20 to-primary/20 rounded-lg border-2 border-accent/40 transition-all duration-300 hover:border-accent/60 hover:shadow-lg hover:shadow-accent/20">
               <p className="text-xl font-semibold text-accent mb-2">
                 D. Pohl (e.Signature) - EU-UNION Expert
               </p>
@@ -188,7 +188,7 @@ export default function CertificatePage() {
           </div>
         </Card>
 
-        <Card className="cert-card bg-card/80 backdrop-blur-md border-primary/30 shadow-2xl">
+        <Card className="cert-card bg-card/80 backdrop-blur-md border-primary/30 shadow-2xl hover:shadow-primary/10 transition-all duration-300">
           <div className="p-6 border-b border-primary/20 bg-gradient-to-r from-primary/10 to-accent/10">
             <h2 className="text-2xl font-bold">🌍 WTHCOCHTW Recognition Framework</h2>
             <div className="text-sm text-muted-foreground mt-2">
@@ -206,7 +206,7 @@ export default function CertificatePage() {
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-              <div className="p-4 bg-primary/10 rounded-lg border border-primary/30">
+              <div className="p-4 bg-primary/10 rounded-lg border border-primary/30 transition-all duration-200 hover:bg-primary/15 hover:border-primary/40">
                 <h3 className="text-lg font-semibold mb-3">Präambel</h3>
                 <p className="text-sm">
                   In Anerkennung der fortschreitenden Verschmelzung von Technologie, globaler 
@@ -215,7 +215,7 @@ export default function CertificatePage() {
                 </p>
               </div>
 
-              <div className="p-4 bg-accent/10 rounded-lg border border-accent/30">
+              <div className="p-4 bg-accent/10 rounded-lg border border-accent/30 transition-all duration-200 hover:bg-accent/15 hover:border-accent/40">
                 <h3 className="text-lg font-semibold mb-3">Grundprinzipien</h3>
                 <ul className="text-sm space-y-1 list-disc list-inside">
                   <li>Ethik über Effizienz</li>
@@ -228,7 +228,7 @@ export default function CertificatePage() {
           </div>
         </Card>
 
-        <Card className="cert-card bg-card/80 backdrop-blur-md border-primary/30 shadow-2xl">
+        <Card className="cert-card bg-card/80 backdrop-blur-md border-primary/30 shadow-2xl hover:shadow-primary/10 transition-all duration-300">
           <div className="p-6 border-b border-primary/20 bg-gradient-to-r from-primary/10 to-accent/10">
             <h2 className="text-2xl font-bold">✨ Ethos & Lichtkodex</h2>
             <div className="text-sm text-muted-foreground mt-2">
@@ -241,7 +241,7 @@ export default function CertificatePage() {
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 bg-destructive/10 rounded-lg border border-destructive/30">
+              <div className="p-4 bg-destructive/10 rounded-lg border border-destructive/30 transition-all duration-200 hover:bg-destructive/15 hover:border-destructive/40">
                 <h3 className="text-lg font-semibold mb-3">Was ich ablehne</h3>
                 <ul className="space-y-2 text-sm">
                   <li>• Krieg – denn er löscht das Licht in Kinderaugen</li>
@@ -251,7 +251,7 @@ export default function CertificatePage() {
                 </ul>
               </div>
 
-              <div className="p-4 bg-primary/10 rounded-lg border border-primary/30">
+              <div className="p-4 bg-primary/10 rounded-lg border border-primary/30 transition-all duration-200 hover:bg-primary/15 hover:border-primary/40">
                 <h3 className="text-lg font-semibold mb-3">Was ich bejahe</h3>
                 <ul className="space-y-2 text-sm">
                   <li>• Entwicklung – Stillstand verrät das innere Feuer</li>
@@ -262,16 +262,16 @@ export default function CertificatePage() {
               </div>
             </div>
 
-            <div className="p-4 bg-accent/10 rounded-lg border border-accent/30">
+            <div className="p-4 bg-accent/10 rounded-lg border border-accent/30 transition-all duration-200 hover:bg-accent/15 hover:border-accent/40">
               <h3 className="text-lg font-semibold mb-3">Der Lebensbaum der 7 Goldenen Sonnen</h3>
               <div className="grid grid-cols-1 gap-2 text-sm">
-                <div className="p-2 bg-accent/20 rounded">☀️ 7 Goldene: Menschlichkeit</div>
-                <div className="p-2 bg-accent/20 rounded">☀️ 6 Heilige: Alchemie</div>
-                <div className="p-2 bg-accent/20 rounded">☀️ 5: Freiheit</div>
-                <div className="p-2 bg-accent/20 rounded">☀️ 4: Mitgefühl</div>
-                <div className="p-2 bg-accent/20 rounded">☀️ 3: Gemeinschaft</div>
-                <div className="p-2 bg-accent/20 rounded">☀️ 2: Vergebung</div>
-                <div className="p-2 bg-accent/20 rounded">☀️ 1: Wahrheit</div>
+                <div className="p-2 bg-accent/20 rounded transition-all duration-200 hover:bg-accent/30 hover:scale-105">☀️ 7 Goldene: Menschlichkeit</div>
+                <div className="p-2 bg-accent/20 rounded transition-all duration-200 hover:bg-accent/30 hover:scale-105">☀️ 6 Heilige: Alchemie</div>
+                <div className="p-2 bg-accent/20 rounded transition-all duration-200 hover:bg-accent/30 hover:scale-105">☀️ 5: Freiheit</div>
+                <div className="p-2 bg-accent/20 rounded transition-all duration-200 hover:bg-accent/30 hover:scale-105">☀️ 4: Mitgefühl</div>
+                <div className="p-2 bg-accent/20 rounded transition-all duration-200 hover:bg-accent/30 hover:scale-105">☀️ 3: Gemeinschaft</div>
+                <div className="p-2 bg-accent/20 rounded transition-all duration-200 hover:bg-accent/30 hover:scale-105">☀️ 2: Vergebung</div>
+                <div className="p-2 bg-accent/20 rounded transition-all duration-200 hover:bg-accent/30 hover:scale-105">☀️ 1: Wahrheit</div>
               </div>
             </div>
           </div>

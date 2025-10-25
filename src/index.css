@@ -6,6 +6,10 @@
     @apply border-border;
   }
   
+  html {
+    scroll-behavior: smooth;
+  }
+  
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
@@ -79,8 +83,18 @@
 
 .neon-glow {
   text-shadow: 0 0 10px oklch(0.75 0.15 195), 0 0 20px oklch(0.75 0.15 195), 0 0 30px oklch(0.75 0.15 195);
+  transition: text-shadow 0.3s ease;
 }
 
 .neon-border {
   box-shadow: 0 0 10px oklch(0.75 0.15 195 / 0.5), inset 0 0 10px oklch(0.75 0.15 195 / 0.3);
+  transition: box-shadow 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
