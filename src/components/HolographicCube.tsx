@@ -38,8 +38,8 @@ export default function HolographicCube({
   }>({ left: null, right: null, top: null, bottom: null })
   const edgeLinesRef = useRef<THREE.LineSegments[]>([])
   const animationStateRef = useRef({ leftOpen, rightOpen, topOpen, bottomOpen, animationSpeed })
-  const defaultCameraPosition = useRef({ x: 2, y: 2, z: 5 })
-  const targetCameraPosition = useRef({ x: 2, y: 2, z: 5 })
+  const defaultCameraPosition = useRef({ x: 3, y: 3, z: 8 })
+  const targetCameraPosition = useRef({ x: 3, y: 3, z: 8 })
   const targetCameraTarget = useRef({ x: 0, y: 0, z: 0 })
   const lampGroupRef = useRef<THREE.Group | null>(null)
   const lampGlowRef = useRef<THREE.PointLight | null>(null)
@@ -60,12 +60,12 @@ export default function HolographicCube({
       0.1,
       1000
     )
-    camera.position.z = 5
-    camera.position.y = 2
-    camera.position.x = 2
+    camera.position.z = 8
+    camera.position.y = 3
+    camera.position.x = 3
     cameraRef.current = camera
     
-    defaultCameraPosition.current = { x: 2, y: 2, z: 5 }
+    defaultCameraPosition.current = { x: 3, y: 3, z: 8 }
 
     const renderer = new THREE.WebGLRenderer({ 
       antialias: true, 
