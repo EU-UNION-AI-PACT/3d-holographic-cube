@@ -1,16 +1,13 @@
 import { useEffect, useRef } from 'react'
 
-interface Particle {
+interface ShootingStar {
   x: number
   y: number
-  size: number
-  speedX: number
-  speedY: number
+  length: number
+  speed: number
   opacity: number
-  fadeDirection: number
-  type: 'star' | 'crystal' | 'pearl'
-  rotation: number
-  rotationSpeed: number
+  color: 'gold' | 'silver'
+  trail: { x: number; y: number; opacity: number }[]
 }
 
 export default function SparklingBackground() {
@@ -30,112 +27,115 @@ export default function SparklingBackground() {
     resizeCanvas()
     window.addEventListener('resize', resizeCanvas)
 
-    const particles: Particle[] = []
-    const particleCount = 80
+    const shootingStars: ShootingStar[] = []
+    const maxStars = 50
 
-    for (let i = 0; i < particleCount; i++) {
-      particles.push({
+    const createShootingStar = () => {
+      const isGold = Math.random() > 0.5
+      return {
         x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        size: Math.random() * 4 + 2,
-        speedX: (Math.random() - 0.5) * 0.3,
-        speedY: (Math.random() - 0.5) * 0.3,
-        opacity: Math.random() * 0.8 + 0.2,
-        fadeDirection: Math.random() > 0.5 ? 1 : -1,
-        type: ['star', 'crystal', 'pearl'][Math.floor(Math.random() * 3)] as 'star' | 'crystal' | 'pearl',
-        rotation: Math.random() * Math.PI * 2,
-        rotationSpeed: (Math.random() - 0.5) * 0.02
-      })
+        y: -20,
+        length: Math.random() * 30 + 20,
+        speed: Math.random() * 3 + 4,
+        opacity: Math.random() * 0.5 + 0.5,
+        color: isGold ? 'gold' : 'silver',
+        trail: []
+      } as ShootingStar
     }
 
-    const drawStar = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number, rotation: number) => {
-      ctx.save()
-      ctx.translate(x, y)
-      ctx.rotate(rotation)
-      
-      ctx.beginPath()
-      for (let i = 0; i < 5; i++) {
-        const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2
-        const radius = i % 2 === 0 ? size : size / 2
-        const px = Math.cos(angle) * radius
-        const py = Math.sin(angle) * radius
-        if (i === 0) {
-          ctx.moveTo(px, py)
-        } else {
-          ctx.lineTo(px, py)
-        }
-      }
-      ctx.closePath()
-      ctx.fill()
-      
-      ctx.restore()
+    for (let i = 0; i < maxStars; i++) {
+      const star = createShootingStar()
+      star.y = Math.random() * canvas.height
+      shootingStars.push(star)
     }
 
-    const drawCrystal = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number, rotation: number) => {
-      ctx.save()
-      ctx.translate(x, y)
-      ctx.rotate(rotation)
-      
-      ctx.beginPath()
-      ctx.moveTo(0, -size)
-      ctx.lineTo(size * 0.6, 0)
-      ctx.lineTo(0, size)
-      ctx.lineTo(-size * 0.6, 0)
-      ctx.closePath()
-      ctx.fill()
-      
-      ctx.restore()
-    }
-
-    const drawPearl = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number) => {
-      const gradient = ctx.createRadialGradient(x - size * 0.2, y - size * 0.2, 0, x, y, size)
-      gradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)')
-      gradient.addColorStop(0.5, 'rgba(200, 220, 255, 0.6)')
-      gradient.addColorStop(1, 'rgba(180, 200, 255, 0.3)')
+    const drawGradientBackground = () => {
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
+      gradient.addColorStop(0, 'oklch(0.25 0.15 280)')
+      gradient.addColorStop(0.5, 'oklch(0.20 0.18 270)')
+      gradient.addColorStop(1, 'oklch(0.15 0.12 260)')
       
       ctx.fillStyle = gradient
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+    }
+
+    const drawShootingStar = (star: ShootingStar) => {
+      const goldColors = {
+        main: `rgba(255, 215, 0, ${star.opacity})`,
+        glow: `rgba(255, 223, 100, ${star.opacity * 0.6})`,
+        trail: `rgba(255, 200, 50, ${star.opacity * 0.3})`
+      }
+      
+      const silverColors = {
+        main: `rgba(220, 220, 255, ${star.opacity})`,
+        glow: `rgba(200, 200, 255, ${star.opacity * 0.6})`,
+        trail: `rgba(180, 180, 240, ${star.opacity * 0.3})`
+      }
+      
+      const colors = star.color === 'gold' ? goldColors : silverColors
+
+      ctx.save()
+      
+      ctx.shadowBlur = 20
+      ctx.shadowColor = colors.glow
+      
+      const gradient = ctx.createLinearGradient(
+        star.x, 
+        star.y, 
+        star.x, 
+        star.y - star.length
+      )
+      gradient.addColorStop(0, colors.main)
+      gradient.addColorStop(0.3, colors.glow)
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
+      
+      ctx.strokeStyle = gradient
+      ctx.lineWidth = 2.5
+      ctx.lineCap = 'round'
+      
       ctx.beginPath()
-      ctx.arc(x, y, size, 0, Math.PI * 2)
+      ctx.moveTo(star.x, star.y)
+      ctx.lineTo(star.x, star.y - star.length)
+      ctx.stroke()
+
+      ctx.shadowBlur = 15
+      ctx.fillStyle = colors.main
+      ctx.beginPath()
+      ctx.arc(star.x, star.y, 2, 0, Math.PI * 2)
       ctx.fill()
+
+      star.trail.forEach((point, index) => {
+        const trailOpacity = point.opacity * (1 - index / star.trail.length)
+        ctx.fillStyle = star.color === 'gold' 
+          ? `rgba(255, 215, 0, ${trailOpacity * 0.3})`
+          : `rgba(220, 220, 255, ${trailOpacity * 0.3})`
+        ctx.beginPath()
+        ctx.arc(point.x, point.y, 1.5, 0, Math.PI * 2)
+        ctx.fill()
+      })
+      
+      ctx.restore()
     }
 
     let animationId: number
 
     const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      drawGradientBackground()
 
-      particles.forEach((particle) => {
-        particle.x += particle.speedX
-        particle.y += particle.speedY
-        particle.rotation += particle.rotationSpeed
-
-        particle.opacity += particle.fadeDirection * 0.01
-        if (particle.opacity >= 1) {
-          particle.fadeDirection = -1
-        } else if (particle.opacity <= 0.2) {
-          particle.fadeDirection = 1
+      shootingStars.forEach((star, index) => {
+        star.trail.unshift({ x: star.x, y: star.y, opacity: star.opacity })
+        if (star.trail.length > 15) {
+          star.trail.pop()
         }
 
-        if (particle.x < 0) particle.x = canvas.width
-        if (particle.x > canvas.width) particle.x = 0
-        if (particle.y < 0) particle.y = canvas.height
-        if (particle.y > canvas.height) particle.y = 0
+        star.y += star.speed
+        star.x += Math.sin(star.y * 0.01) * 0.5
 
-        if (particle.type === 'star') {
-          ctx.fillStyle = `rgba(100, 200, 255, ${particle.opacity})`
-          ctx.shadowBlur = 10
-          ctx.shadowColor = `rgba(100, 200, 255, ${particle.opacity})`
-          drawStar(ctx, particle.x, particle.y, particle.size, particle.rotation)
-          ctx.shadowBlur = 0
-        } else if (particle.type === 'crystal') {
-          ctx.fillStyle = `rgba(200, 150, 255, ${particle.opacity})`
-          ctx.shadowBlur = 8
-          ctx.shadowColor = `rgba(200, 150, 255, ${particle.opacity})`
-          drawCrystal(ctx, particle.x, particle.y, particle.size, particle.rotation)
-          ctx.shadowBlur = 0
-        } else {
-          drawPearl(ctx, particle.x, particle.y, particle.size)
+        if (star.y > canvas.height + 20) {
+          shootingStars[index] = createShootingStar()
         }
+
+        drawShootingStar(star)
       })
 
       animationId = requestAnimationFrame(animate)
