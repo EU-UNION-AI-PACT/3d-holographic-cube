@@ -10,6 +10,7 @@ interface HolographicCubeProps {
   autoRotate: boolean
   animationSpeed: number
   activePanel?: string | null
+  lampOn?: boolean
 }
 
 const GOLDEN_RATIO = 1.618033988749
@@ -21,7 +22,8 @@ export default function HolographicCube({
   bottomOpen,
   autoRotate,
   animationSpeed,
-  activePanel
+  activePanel,
+  lampOn = true
 }: HolographicCubeProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<THREE.Scene | null>(null)
@@ -39,6 +41,10 @@ export default function HolographicCube({
   const defaultCameraPosition = useRef({ x: 2, y: 2, z: 5 })
   const targetCameraPosition = useRef({ x: 2, y: 2, z: 5 })
   const targetCameraTarget = useRef({ x: 0, y: 0, z: 0 })
+  const lampGroupRef = useRef<THREE.Group | null>(null)
+  const lampGlowRef = useRef<THREE.PointLight | null>(null)
+  const lampTopRef = useRef<THREE.Mesh | null>(null)
+  const pinkGlowRef = useRef<THREE.Mesh | null>(null)
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -270,21 +276,67 @@ export default function HolographicCube({
     scene.add(backLine)
     edgeLinesRef.current.push(backLine)
 
-    const centerSphere = new THREE.Mesh(
-      new THREE.SphereGeometry(0.15, 32, 32),
+    const lampGroup = new THREE.Group()
+    lampGroupRef.current = lampGroup
+    
+    const lampBase = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.15, 0.2, 0.4, 32),
       new THREE.MeshPhysicalMaterial({
-        color: 0xffff00,
-        emissive: 0xffff00,
-        emissiveIntensity: 5,
-        transparent: true,
-        opacity: 0.95
+        color: 0xFFD700,
+        metalness: 0.9,
+        roughness: 0.1,
+        emissive: 0xFFD700,
+        emissiveIntensity: 0.5
       })
     )
-    scene.add(centerSphere)
-
-    const sphereGlow = new THREE.PointLight(0xffff00, 4, 10)
-    sphereGlow.position.set(0, 0, 0)
-    scene.add(sphereGlow)
+    lampBase.position.y = -0.2
+    lampGroup.add(lampBase)
+    
+    const lampNeck = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.05, 0.05, 0.3, 16),
+      new THREE.MeshPhysicalMaterial({
+        color: 0xFFD700,
+        metalness: 0.9,
+        roughness: 0.1
+      })
+    )
+    lampNeck.position.y = 0.15
+    lampGroup.add(lampNeck)
+    
+    const lampTop = new THREE.Mesh(
+      new THREE.SphereGeometry(0.25, 32, 32),
+      new THREE.MeshPhysicalMaterial({
+        color: 0xFF1493,
+        emissive: 0xFF1493,
+        emissiveIntensity: 3,
+        transparent: true,
+        opacity: 0.9,
+        metalness: 0.3,
+        roughness: 0.2
+      })
+    )
+    lampTop.position.y = 0.35
+    lampGroup.add(lampTop)
+    lampTopRef.current = lampTop
+    
+    const lampGlow = new THREE.PointLight(0xFF1493, 5, 8)
+    lampGlow.position.y = 0.35
+    lampGroup.add(lampGlow)
+    lampGlowRef.current = lampGlow
+    
+    const pinkGlow = new THREE.Mesh(
+      new THREE.SphereGeometry(0.35, 32, 32),
+      new THREE.MeshBasicMaterial({
+        color: 0xFFC0CB,
+        transparent: true,
+        opacity: 0.3
+      })
+    )
+    pinkGlow.position.y = 0.35
+    lampGroup.add(pinkGlow)
+    pinkGlowRef.current = pinkGlow
+    
+    scene.add(lampGroup)
 
     const createGelatinBall = (position: THREE.Vector3, color: number) => {
       const ballMaterial = new THREE.MeshPhysicalMaterial({
@@ -531,7 +583,8 @@ export default function HolographicCube({
       }
 
       particles.rotation.y += 0.001
-      centerSphere.rotation.y += 0.02
+      if (lampGroupRef.current) lampGroupRef.current.rotation.y += 0.02
+      if (pinkGlowRef.current) pinkGlowRef.current.scale.setScalar(1 + Math.sin(time * 2) * 0.1)
 
       if (rendererRef.current && sceneRef.current && cameraRef.current) {
         rendererRef.current.render(sceneRef.current, cameraRef.current)
@@ -595,6 +648,20 @@ export default function HolographicCube({
         if (controlsRef.current) controlsRef.current.autoRotate = autoRotate
     }
   }, [activePanel, autoRotate])
+
+  useEffect(() => {
+    if (lampGlowRef.current && lampTopRef.current) {
+      if (lampOn) {
+        lampGlowRef.current.intensity = 5
+        const material = lampTopRef.current.material as THREE.MeshPhysicalMaterial
+        material.emissiveIntensity = 3
+      } else {
+        lampGlowRef.current.intensity = 0
+        const material = lampTopRef.current.material as THREE.MeshPhysicalMaterial
+        material.emissiveIntensity = 0.3
+      }
+    }
+  }, [lampOn])
 
   return (
     <div 

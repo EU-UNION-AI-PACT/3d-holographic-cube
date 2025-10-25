@@ -16,7 +16,8 @@ import {
   Play,
   Pause,
   Certificate,
-  Star
+  Star,
+  Lightbulb
 } from '@phosphor-icons/react'
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
   const [animationSpeed, setAnimationSpeed] = useKV<number>('animation-speed', 5)
   const [isAnimating, setIsAnimating] = useState(false)
   const [showCertificate, setShowCertificate] = useKV<boolean>('show-certificate', false)
+  const [lampOn, setLampOn] = useKV<boolean>('lamp-on', true)
 
   const leftOpen = activePanel === 'left' ? 1 : 0
   const rightOpen = activePanel === 'right' ? 1 : 0
@@ -77,6 +79,7 @@ function App() {
           autoRotate={autoRotate ?? true}
           animationSpeed={animationSpeed ?? 5}
           activePanel={activePanel}
+          lampOn={lampOn ?? true}
         />
       )}
 
@@ -92,7 +95,15 @@ function App() {
         </h1>
       </div>
 
-      <div className="absolute top-6 right-6 z-10">
+      <div className="absolute top-6 right-6 z-10 flex gap-2">
+        <Button
+          onClick={() => setLampOn(!lampOn)}
+          variant="outline"
+          size="icon"
+          className={`bg-card/80 backdrop-blur-md border-primary/30 ${lampOn ? 'text-pink-500 border-pink-500/50' : ''}`}
+        >
+          <Lightbulb weight={lampOn ? 'fill' : 'regular'} />
+        </Button>
         <Button
           onClick={() => setShowCertificate(!showCertificate)}
           variant="outline"
