@@ -45,6 +45,8 @@ export default function HolographicCube({
   const lampGlowRef = useRef<THREE.PointLight | null>(null)
   const lampTopRef = useRef<THREE.Mesh | null>(null)
   const pinkGlowRef = useRef<THREE.Mesh | null>(null)
+  const waterParticlesRef = useRef<THREE.Points[]>([])
+  const kabbalahTreeRef = useRef<THREE.Group | null>(null)
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -336,6 +338,187 @@ export default function HolographicCube({
     lampGroup.add(pinkGlow)
     pinkGlowRef.current = pinkGlow
     
+    const createFlowingWaterLines = () => {
+      const waterGroup = new THREE.Group()
+      const numStreams = 12
+      const radius = 0.8
+      const height = 2.5
+      
+      for (let i = 0; i < numStreams; i++) {
+        const angle = (i / numStreams) * Math.PI * 2
+        const curve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(
+            Math.cos(angle) * radius,
+            -height / 2,
+            Math.sin(angle) * radius
+          ),
+          new THREE.Vector3(
+            Math.cos(angle + 0.3) * (radius * 0.7),
+            -height / 4,
+            Math.sin(angle + 0.3) * (radius * 0.7)
+          ),
+          new THREE.Vector3(
+            Math.cos(angle - 0.2) * (radius * 0.5),
+            0,
+            Math.sin(angle - 0.2) * (radius * 0.5)
+          ),
+          new THREE.Vector3(
+            Math.cos(angle + 0.4) * (radius * 0.6),
+            height / 4,
+            Math.sin(angle + 0.4) * (radius * 0.6)
+          ),
+          new THREE.Vector3(
+            Math.cos(angle) * radius,
+            height / 2,
+            Math.sin(angle) * radius
+          )
+        ])
+        
+        const tubeGeometry = new THREE.TubeGeometry(curve, 64, 0.015, 8, false)
+        const tubeMaterial = new THREE.MeshPhysicalMaterial({
+          color: 0x00ffff,
+          emissive: 0x00ffff,
+          emissiveIntensity: 2,
+          transparent: true,
+          opacity: 0.7,
+          metalness: 0.8,
+          roughness: 0.2,
+          transmission: 0.5
+        })
+        
+        const tube = new THREE.Mesh(tubeGeometry, tubeMaterial)
+        waterGroup.add(tube)
+        
+        const particleCount = 30
+        const particlePositions = new Float32Array(particleCount * 3)
+        const particleSizes = new Float32Array(particleCount)
+        
+        for (let j = 0; j < particleCount; j++) {
+          const t = j / particleCount
+          const point = curve.getPoint(t)
+          particlePositions[j * 3] = point.x
+          particlePositions[j * 3 + 1] = point.y
+          particlePositions[j * 3 + 2] = point.z
+          particleSizes[j] = Math.random() * 0.05 + 0.02
+        }
+        
+        const particleGeometry = new THREE.BufferGeometry()
+        particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3))
+        particleGeometry.setAttribute('size', new THREE.BufferAttribute(particleSizes, 1))
+        
+        const particleMaterial = new THREE.ShaderMaterial({
+          uniforms: {
+            time: { value: 0 },
+            color: { value: new THREE.Color(0x00ffff) }
+          },
+          vertexShader: `
+            attribute float size;
+            uniform float time;
+            varying float vAlpha;
+            
+            void main() {
+              vAlpha = sin(time * 3.0 + position.y * 5.0) * 0.5 + 0.5;
+              vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+              gl_PointSize = size * 100.0 / -mvPosition.z;
+              gl_Position = projectionMatrix * mvPosition;
+            }
+          `,
+          fragmentShader: `
+            uniform vec3 color;
+            varying float vAlpha;
+            
+            void main() {
+              float dist = length(gl_PointCoord - vec2(0.5));
+              if (dist > 0.5) discard;
+              
+              float alpha = (1.0 - dist * 2.0) * vAlpha;
+              gl_FragColor = vec4(color, alpha);
+            }
+          `,
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        })
+        
+        const particleSystem = new THREE.Points(particleGeometry, particleMaterial)
+        waterGroup.add(particleSystem)
+        waterParticlesRef.current.push(particleSystem)
+      }
+      
+      return waterGroup
+    }
+    
+    const createKabbalahTreeOfLife = () => {
+      const treeGroup = new THREE.Group()
+      
+      const sephirot = [
+        { name: 'Kether', pos: new THREE.Vector3(0, 1.2, 0), color: 0xFFFFFF },
+        { name: 'Chokmah', pos: new THREE.Vector3(0.4, 0.9, 0), color: 0xFF1493 },
+        { name: 'Binah', pos: new THREE.Vector3(-0.4, 0.9, 0), color: 0xFF1493 },
+        { name: 'Chesed', pos: new THREE.Vector3(0.4, 0.4, 0), color: 0x00ffff },
+        { name: 'Geburah', pos: new THREE.Vector3(-0.4, 0.4, 0), color: 0xFF69B4 },
+        { name: 'Tiphareth', pos: new THREE.Vector3(0, 0.6, 0), color: 0xFFD700 },
+        { name: 'Netzach', pos: new THREE.Vector3(0.4, -0.1, 0), color: 0x00ff99 },
+        { name: 'Hod', pos: new THREE.Vector3(-0.4, -0.1, 0), color: 0x00ffff },
+        { name: 'Yesod', pos: new THREE.Vector3(0, -0.3, 0), color: 0xFFC0CB },
+        { name: 'Malkuth', pos: new THREE.Vector3(0, -0.8, 0), color: 0xFF1493 }
+      ]
+      
+      const pathConnections = [
+        [0, 1], [0, 2], [1, 2], [1, 3], [2, 4],
+        [3, 4], [3, 5], [4, 5], [5, 6], [5, 7],
+        [6, 7], [6, 8], [7, 8], [8, 9]
+      ]
+      
+      sephirot.forEach(seph => {
+        const sphere = new THREE.Mesh(
+          new THREE.SphereGeometry(0.08, 16, 16),
+          new THREE.MeshPhysicalMaterial({
+            color: seph.color,
+            emissive: seph.color,
+            emissiveIntensity: 1.5,
+            transparent: true,
+            opacity: 0.8,
+            metalness: 0.5,
+            roughness: 0.2
+          })
+        )
+        sphere.position.copy(seph.pos)
+        treeGroup.add(sphere)
+        
+        const light = new THREE.PointLight(seph.color, 0.5, 1)
+        light.position.copy(seph.pos)
+        treeGroup.add(light)
+      })
+      
+      pathConnections.forEach(([start, end]) => {
+        const points: THREE.Vector3[] = []
+        points.push(sephirot[start].pos)
+        points.push(sephirot[end].pos)
+        
+        const geometry = new THREE.BufferGeometry().setFromPoints(points)
+        const material = new THREE.LineBasicMaterial({
+          color: 0xFFC0CB,
+          transparent: true,
+          opacity: 0.6,
+          linewidth: 2
+        })
+        
+        const line = new THREE.Line(geometry, material)
+        treeGroup.add(line)
+      })
+      
+      return treeGroup
+    }
+    
+    const waterLines = createFlowingWaterLines()
+    lampGroup.add(waterLines)
+    
+    const kabbalahTree = createKabbalahTreeOfLife()
+    kabbalahTree.scale.setScalar(0.8)
+    lampGroup.add(kabbalahTree)
+    kabbalahTreeRef.current = kabbalahTree
+    
     scene.add(lampGroup)
 
     const createGelatinBall = (position: THREE.Vector3, color: number) => {
@@ -585,6 +768,19 @@ export default function HolographicCube({
       particles.rotation.y += 0.001
       if (lampGroupRef.current) lampGroupRef.current.rotation.y += 0.02
       if (pinkGlowRef.current) pinkGlowRef.current.scale.setScalar(1 + Math.sin(time * 2) * 0.1)
+      
+      waterParticlesRef.current.forEach(particleSystem => {
+        const material = particleSystem.material as THREE.ShaderMaterial
+        if (material.uniforms && material.uniforms.time) {
+          material.uniforms.time.value = time
+        }
+      })
+      
+      if (kabbalahTreeRef.current) {
+        kabbalahTreeRef.current.rotation.y += 0.005
+        const pulseScale = 1 + Math.sin(time * 1.5) * 0.05
+        kabbalahTreeRef.current.scale.setScalar(0.8 * pulseScale)
+      }
 
       if (rendererRef.current && sceneRef.current && cameraRef.current) {
         rendererRef.current.render(sceneRef.current, cameraRef.current)
