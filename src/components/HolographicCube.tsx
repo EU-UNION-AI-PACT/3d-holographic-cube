@@ -42,7 +42,7 @@ export default function HolographicCube({
 
     const camera = new THREE.PerspectiveCamera(
       75,
-      window.innerWidth / window.innerHeight,
+      1,
       0.1,
       1000
     )
@@ -56,7 +56,7 @@ export default function HolographicCube({
       alpha: true,
       powerPreference: 'high-performance'
     })
-    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setSize(1280, 1280)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setClearColor(0x000000, 0)
     containerRef.current.appendChild(renderer.domElement)
@@ -69,38 +69,46 @@ export default function HolographicCube({
     controls.autoRotateSpeed = 0.5
     controlsRef.current = controls
 
-    const ambientLight = new THREE.AmbientLight(0x00ffff, 0.5)
+    const ambientLight = new THREE.AmbientLight(0x00ffff, 1.5)
     scene.add(ambientLight)
 
-    const pointLight1 = new THREE.PointLight(0x00ffff, 1, 100)
+    const pointLight1 = new THREE.PointLight(0x00ffff, 3, 100)
     pointLight1.position.set(5, 5, 5)
     scene.add(pointLight1)
 
-    const pointLight2 = new THREE.PointLight(0xff00ff, 1, 100)
+    const pointLight2 = new THREE.PointLight(0xff00ff, 3, 100)
     pointLight2.position.set(-5, -5, 5)
     scene.add(pointLight2)
 
-    const createNeonMaterial = (color: number, opacity: number = 0.15) => {
+    const pointLight3 = new THREE.PointLight(0x00ff99, 2.5, 100)
+    pointLight3.position.set(0, 5, -5)
+    scene.add(pointLight3)
+
+    const pointLight4 = new THREE.PointLight(0xffff00, 2.5, 100)
+    pointLight4.position.set(0, -5, 5)
+    scene.add(pointLight4)
+
+    const createNeonMaterial = (color: number, opacity: number = 0.25) => {
       return new THREE.MeshPhysicalMaterial({
         color: color,
         transparent: true,
         opacity: opacity,
-        metalness: 0.3,
-        roughness: 0.1,
+        metalness: 0.5,
+        roughness: 0.05,
         clearcoat: 1.0,
-        clearcoatRoughness: 0.1,
+        clearcoatRoughness: 0.05,
         side: THREE.DoubleSide,
         emissive: color,
-        emissiveIntensity: 0.5
+        emissiveIntensity: 2.5
       })
     }
 
     const createGlowingEdge = (color: number = 0x00ffff) => {
       return new THREE.LineBasicMaterial({
         color: color,
-        linewidth: 2,
+        linewidth: 3,
         transparent: true,
-        opacity: 0.9
+        opacity: 1.0
       })
     }
 
@@ -175,16 +183,20 @@ export default function HolographicCube({
     scene.add(backLine)
 
     const centerSphere = new THREE.Mesh(
-      new THREE.SphereGeometry(0.1, 32, 32),
+      new THREE.SphereGeometry(0.15, 32, 32),
       new THREE.MeshPhysicalMaterial({
         color: 0xffff00,
         emissive: 0xffff00,
-        emissiveIntensity: 2,
+        emissiveIntensity: 5,
         transparent: true,
-        opacity: 0.8
+        opacity: 0.95
       })
     )
     scene.add(centerSphere)
+
+    const sphereGlow = new THREE.PointLight(0xffff00, 4, 10)
+    sphereGlow.position.set(0, 0, 0)
+    scene.add(sphereGlow)
 
     const particles = new THREE.Group()
     const particleGeometry = new THREE.SphereGeometry(0.02, 8, 8)
@@ -208,9 +220,9 @@ export default function HolographicCube({
     const handleResize = () => {
       if (!cameraRef.current || !rendererRef.current) return
       
-      cameraRef.current.aspect = window.innerWidth / window.innerHeight
+      cameraRef.current.aspect = 1
       cameraRef.current.updateProjectionMatrix()
-      rendererRef.current.setSize(window.innerWidth, window.innerHeight)
+      rendererRef.current.setSize(1280, 1280)
     }
 
     window.addEventListener('resize', handleResize)
@@ -301,8 +313,12 @@ export default function HolographicCube({
   return (
     <div 
       ref={containerRef} 
-      className="fixed inset-0 w-full h-full"
-      style={{ touchAction: 'none' }}
+      className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+      style={{ 
+        touchAction: 'none',
+        width: '1280px',
+        height: '1280px'
+      }}
     />
   )
 }
