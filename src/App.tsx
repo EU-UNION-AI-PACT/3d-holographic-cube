@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 import HolographicCube from '@/components/HolographicCube'
 import CertificatePage from '@/components/CertificatePage'
+import SparklingBackground from '@/components/SparklingBackground'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
@@ -70,6 +71,8 @@ function App() {
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-background">
+      <SparklingBackground />
+      
       {!showCertificate && (
         <HolographicCube
           leftOpen={leftOpen}
