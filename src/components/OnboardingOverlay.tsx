@@ -53,7 +53,10 @@ export default function OnboardingOverlay({ onComplete }: OnboardingOverlayProps
   const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 })
 
   useEffect(() => {
-    setDimensions({ width: window.innerWidth, height: window.innerHeight })
+    const updateDimensions = () => {
+      setDimensions({ width: window.innerWidth, height: window.innerHeight })
+    }
+    updateDimensions()
   }, [])
 
   const handleNext = () => {
