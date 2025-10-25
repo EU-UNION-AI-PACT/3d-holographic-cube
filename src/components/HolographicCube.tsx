@@ -47,6 +47,7 @@ export default function HolographicCube({
   const pinkGlowRef = useRef<THREE.Mesh | null>(null)
   const waterParticlesRef = useRef<THREE.Points[]>([])
   const kabbalahTreeRef = useRef<THREE.Group | null>(null)
+  const prismaticRaysRef = useRef<THREE.Mesh[]>([])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -519,6 +520,96 @@ export default function HolographicCube({
     lampGroup.add(kabbalahTree)
     kabbalahTreeRef.current = kabbalahTree
     
+    const createPrismaticRays = () => {
+      const raysGroup = new THREE.Group()
+      const numRays = 12
+      const rayColors = [
+        0xFF0000,
+        0xFF7F00,
+        0xFFFF00,
+        0x00FF00,
+        0x0000FF,
+        0x4B0082,
+        0x9400D3,
+        0xFF1493,
+        0x00FFFF,
+        0xFF69B4,
+        0x00FF99,
+        0xFFD700
+      ]
+      
+      for (let i = 0; i < numRays; i++) {
+        const angle = (i / numRays) * Math.PI * 2
+        const rayLength = 3.5
+        const rayWidth = 0.08
+        
+        const rayGeometry = new THREE.ConeGeometry(rayWidth, rayLength, 4, 1, true)
+        const rayMaterial = new THREE.ShaderMaterial({
+          uniforms: {
+            time: { value: 0 },
+            baseColor: { value: new THREE.Color(rayColors[i]) },
+            offset: { value: i * 0.5 }
+          },
+          vertexShader: `
+            varying vec2 vUv;
+            varying vec3 vPosition;
+            void main() {
+              vUv = uv;
+              vPosition = position;
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `,
+          fragmentShader: `
+            uniform float time;
+            uniform vec3 baseColor;
+            uniform float offset;
+            varying vec2 vUv;
+            varying vec3 vPosition;
+            
+            void main() {
+              float pulse = sin(time * 2.0 + offset) * 0.3 + 0.7;
+              float gradient = 1.0 - vUv.y;
+              
+              float shimmer = sin(vUv.y * 20.0 + time * 3.0) * 0.2 + 0.8;
+              
+              float alpha = gradient * gradient * pulse * 0.6;
+              
+              vec3 color = baseColor * shimmer;
+              
+              gl_FragColor = vec4(color, alpha);
+            }
+          `,
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          side: THREE.DoubleSide,
+          depthWrite: false
+        })
+        
+        const ray = new THREE.Mesh(rayGeometry, rayMaterial)
+        
+        ray.position.y = 0.275
+        ray.rotation.z = Math.PI
+        
+        const directionX = Math.cos(angle)
+        const directionZ = Math.sin(angle)
+        const spreadAngle = Math.PI / 6
+        
+        ray.rotation.x = Math.cos(angle) * spreadAngle
+        ray.rotation.y = angle
+        
+        ray.position.x = directionX * 0.15
+        ray.position.z = directionZ * 0.15
+        
+        raysGroup.add(ray)
+        prismaticRaysRef.current.push(ray)
+      }
+      
+      return raysGroup
+    }
+    
+    const prismaticRays = createPrismaticRays()
+    lampGroup.add(prismaticRays)
+    
     scene.add(lampGroup)
 
     const createGelatinBall = (position: THREE.Vector3, color: number) => {
@@ -787,6 +878,13 @@ export default function HolographicCube({
       if (lampGroupRef.current) lampGroupRef.current.rotation.y += 0.02
       if (pinkGlowRef.current) pinkGlowRef.current.scale.setScalar(1 + Math.sin(time * 2) * 0.1)
       
+      prismaticRaysRef.current.forEach((ray) => {
+        const material = ray.material as THREE.ShaderMaterial
+        if (material.uniforms && material.uniforms.time) {
+          material.uniforms.time.value = time
+        }
+      })
+      
       waterParticlesRef.current.forEach(particleSystem => {
         const material = particleSystem.material as THREE.ShaderMaterial
         if (material.uniforms && material.uniforms.time) {
@@ -869,10 +967,18 @@ export default function HolographicCube({
         lampGlowRef.current.intensity = 3
         const material = lampTopRef.current.material as THREE.MeshPhysicalMaterial
         material.emissiveIntensity = 2.5
+        
+        prismaticRaysRef.current.forEach((ray) => {
+          ray.visible = true
+        })
       } else {
         lampGlowRef.current.intensity = 0
         const material = lampTopRef.current.material as THREE.MeshPhysicalMaterial
         material.emissiveIntensity = 0.2
+        
+        prismaticRaysRef.current.forEach((ray) => {
+          ray.visible = false
+        })
       }
     }
   }, [lampOn])
