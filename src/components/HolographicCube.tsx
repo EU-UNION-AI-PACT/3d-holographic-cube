@@ -275,8 +275,9 @@ export default function HolographicCube({
     scene.add(backLine)
     edgeLinesRef.current.push(backLine)
 
-    const lampGroup = new THREE.Group()
-    lampGroupRef.current = lampGroup
+    if (lampOn) {
+      const lampGroup = new THREE.Group()
+      lampGroupRef.current = lampGroup
     
     const lampBase = new THREE.Mesh(
       new THREE.CylinderGeometry(0.08, 0.12, 0.3, 32),
@@ -615,9 +616,10 @@ export default function HolographicCube({
       return raysGroup
     }
     
-    const prismaticRays = createPrismaticRays()
-    lampGroup.add(prismaticRays)
-    scene.add(lampGroup)
+      const prismaticRays = createPrismaticRays()
+      lampGroup.add(prismaticRays)
+      scene.add(lampGroup)
+    }
 
     const createGelatinBall = (position: THREE.Vector3, color: number) => {
       const ballMaterial = new THREE.MeshPhysicalMaterial({
