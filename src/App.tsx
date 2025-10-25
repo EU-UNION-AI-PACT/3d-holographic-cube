@@ -3,6 +3,7 @@ import { useKV } from '@github/spark/hooks'
 import HolographicCube from '@/components/HolographicCube'
 import CertificatePage from '@/components/CertificatePage'
 import SparklingBackground from '@/components/SparklingBackground'
+import OnboardingOverlay from '@/components/OnboardingOverlay'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
@@ -28,6 +29,7 @@ function App() {
   const [isAnimating, setIsAnimating] = useState(false)
   const [showCertificate, setShowCertificate] = useKV<boolean>('show-certificate', false)
   const [lampOn, setLampOn] = useKV<boolean>('lamp-on', true)
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useKV<boolean>('has-seen-onboarding', false)
 
   const leftOpen = activePanel === 'left' ? 1 : 0
   const rightOpen = activePanel === 'right' ? 1 : 0
@@ -69,8 +71,16 @@ function App() {
     setIsAnimating(false)
   }
 
+  const handleOnboardingComplete = () => {
+    setHasSeenOnboarding(true)
+  }
+
   return (
     <div className="relative w-full h-screen overflow-hidden bg-background">
+      {!hasSeenOnboarding && (
+        <OnboardingOverlay onComplete={handleOnboardingComplete} />
+      )}
+      
       <SparklingBackground />
       
       {!showCertificate && (

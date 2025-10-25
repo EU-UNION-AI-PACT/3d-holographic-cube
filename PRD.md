@@ -12,6 +12,13 @@ A holographic 3D cube visualization with interactive opening panels that unfold 
 
 ## Essential Features
 
+**Onboarding Experience**
+- Functionality: Interactive multi-step tutorial that introduces users to all features
+- Purpose: Ensures first-time users understand how to interact with the holographic star
+- Trigger: On first application visit (persisted via useKV)
+- Progression: User loads app → Onboarding overlay appears → User navigates through 5 steps explaining features → Visual highlights show relevant UI elements → User completes or skips → Onboarding dismissed permanently
+- Success criteria: Clear step-by-step introduction, smooth animations, ability to skip, never shows again after completion
+
 **3D Holographic Cube Rendering**
 - Functionality: Renders a transparent neon cube with visible edges and faces in 3D space
 - Purpose: Provides the core visual centerpiece with holographic appearance
