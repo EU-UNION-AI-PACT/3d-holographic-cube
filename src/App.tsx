@@ -17,12 +17,12 @@ import {
 } from '@phosphor-icons/react'
 
 function App() {
-  const [leftOpen, setLeftOpen] = useKV('panel-left', 0)
-  const [rightOpen, setRightOpen] = useKV('panel-right', 0)
-  const [topOpen, setTopOpen] = useKV('panel-top', 0)
-  const [bottomOpen, setBottomOpen] = useKV('panel-bottom', 0)
-  const [autoRotate, setAutoRotate] = useKV('auto-rotate', true)
-  const [animationSpeed, setAnimationSpeed] = useKV('animation-speed', 5)
+  const [leftOpen, setLeftOpen] = useKV<number>('panel-left', 0)
+  const [rightOpen, setRightOpen] = useKV<number>('panel-right', 0)
+  const [topOpen, setTopOpen] = useKV<number>('panel-top', 0)
+  const [bottomOpen, setBottomOpen] = useKV<number>('panel-bottom', 0)
+  const [autoRotate, setAutoRotate] = useKV<boolean>('auto-rotate', true)
+  const [animationSpeed, setAnimationSpeed] = useKV<number>('animation-speed', 5)
   const [isAnimating, setIsAnimating] = useState(false)
 
   const togglePanel = (panel: 'left' | 'right' | 'top' | 'bottom') => {
@@ -86,12 +86,12 @@ function App() {
   return (
     <div className="relative w-full h-screen overflow-hidden bg-background">
       <HolographicCube
-        leftOpen={leftOpen}
-        rightOpen={rightOpen}
-        topOpen={topOpen}
-        bottomOpen={bottomOpen}
-        autoRotate={autoRotate}
-        animationSpeed={animationSpeed}
+        leftOpen={leftOpen ?? 0}
+        rightOpen={rightOpen ?? 0}
+        topOpen={topOpen ?? 0}
+        bottomOpen={bottomOpen ?? 0}
+        autoRotate={autoRotate ?? true}
+        animationSpeed={animationSpeed ?? 5}
       />
 
       <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
@@ -107,20 +107,20 @@ function App() {
             <div className="grid grid-cols-3 gap-2">
               <div />
               <Button
-                variant={topOpen > 0 ? 'default' : 'outline'}
+                variant={(topOpen ?? 0) > 0 ? 'default' : 'outline'}
                 size="icon"
                 onClick={() => togglePanel('top')}
-                className={topOpen > 0 ? 'bg-accent hover:bg-accent/90' : ''}
+                className={(topOpen ?? 0) > 0 ? 'bg-accent hover:bg-accent/90' : ''}
               >
                 <CaretUp weight="bold" />
               </Button>
               <div />
               
               <Button
-                variant={leftOpen > 0 ? 'default' : 'outline'}
+                variant={(leftOpen ?? 0) > 0 ? 'default' : 'outline'}
                 size="icon"
                 onClick={() => togglePanel('left')}
-                className={leftOpen > 0 ? 'bg-accent hover:bg-accent/90' : ''}
+                className={(leftOpen ?? 0) > 0 ? 'bg-accent hover:bg-accent/90' : ''}
               >
                 <CaretLeft weight="bold" />
               </Button>
@@ -128,20 +128,20 @@ function App() {
                 <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
               </div>
               <Button
-                variant={rightOpen > 0 ? 'default' : 'outline'}
+                variant={(rightOpen ?? 0) > 0 ? 'default' : 'outline'}
                 size="icon"
                 onClick={() => togglePanel('right')}
-                className={rightOpen > 0 ? 'bg-accent hover:bg-accent/90' : ''}
+                className={(rightOpen ?? 0) > 0 ? 'bg-accent hover:bg-accent/90' : ''}
               >
                 <CaretRight weight="bold" />
               </Button>
               
               <div />
               <Button
-                variant={bottomOpen > 0 ? 'default' : 'outline'}
+                variant={(bottomOpen ?? 0) > 0 ? 'default' : 'outline'}
                 size="icon"
                 onClick={() => togglePanel('bottom')}
-                className={bottomOpen > 0 ? 'bg-accent hover:bg-accent/90' : ''}
+                className={(bottomOpen ?? 0) > 0 ? 'bg-accent hover:bg-accent/90' : ''}
               >
                 <CaretDown weight="bold" />
               </Button>
@@ -172,7 +172,7 @@ function App() {
             <div>
               <Label className="text-sm mb-2 block">Animation Speed</Label>
               <Slider
-                value={[animationSpeed]}
+                value={[animationSpeed ?? 5]}
                 onValueChange={(value) => setAnimationSpeed(value[0])}
                 min={1}
                 max={20}
@@ -180,7 +180,7 @@ function App() {
                 className="w-full"
               />
               <div className="text-xs text-muted-foreground mt-1 text-right">
-                {animationSpeed}
+                {animationSpeed ?? 5}
               </div>
             </div>
 

@@ -32,6 +32,7 @@ export default function HolographicCube({
     top: THREE.Group | null
     bottom: THREE.Group | null
   }>({ left: null, right: null, top: null, bottom: null })
+  const animationStateRef = useRef({ leftOpen, rightOpen, topOpen, bottomOpen, animationSpeed })
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -223,6 +224,45 @@ export default function HolographicCube({
         controlsRef.current.update()
       }
 
+      const { leftOpen, rightOpen, topOpen, bottomOpen, animationSpeed } = animationStateRef.current
+      const speed = animationSpeed / 100
+
+      if (panelsRef.current.left) {
+        const targetRotation = leftOpen * Math.PI / 2
+        panelsRef.current.left.rotation.y = THREE.MathUtils.lerp(
+          panelsRef.current.left.rotation.y,
+          Math.PI / 2 + targetRotation,
+          speed
+        )
+      }
+
+      if (panelsRef.current.right) {
+        const targetRotation = rightOpen * Math.PI / 2
+        panelsRef.current.right.rotation.y = THREE.MathUtils.lerp(
+          panelsRef.current.right.rotation.y,
+          -Math.PI / 2 - targetRotation,
+          speed
+        )
+      }
+
+      if (panelsRef.current.top) {
+        const targetRotation = topOpen * Math.PI / 2
+        panelsRef.current.top.rotation.x = THREE.MathUtils.lerp(
+          panelsRef.current.top.rotation.x,
+          -Math.PI / 2 - targetRotation,
+          speed
+        )
+      }
+
+      if (panelsRef.current.bottom) {
+        const targetRotation = bottomOpen * Math.PI / 2
+        panelsRef.current.bottom.rotation.x = THREE.MathUtils.lerp(
+          panelsRef.current.bottom.rotation.x,
+          Math.PI / 2 + targetRotation,
+          speed
+        )
+      }
+
       particles.rotation.y += 0.001
       centerSphere.rotation.y += 0.02
 
@@ -255,43 +295,7 @@ export default function HolographicCube({
   }, [autoRotate])
 
   useEffect(() => {
-    const speed = animationSpeed / 100
-
-    if (panelsRef.current.left) {
-      const targetRotation = leftOpen * Math.PI / 2
-      panelsRef.current.left.rotation.y = THREE.MathUtils.lerp(
-        panelsRef.current.left.rotation.y,
-        Math.PI / 2 + targetRotation,
-        speed
-      )
-    }
-
-    if (panelsRef.current.right) {
-      const targetRotation = rightOpen * Math.PI / 2
-      panelsRef.current.right.rotation.y = THREE.MathUtils.lerp(
-        panelsRef.current.right.rotation.y,
-        -Math.PI / 2 - targetRotation,
-        speed
-      )
-    }
-
-    if (panelsRef.current.top) {
-      const targetRotation = topOpen * Math.PI / 2
-      panelsRef.current.top.rotation.x = THREE.MathUtils.lerp(
-        panelsRef.current.top.rotation.x,
-        -Math.PI / 2 - targetRotation,
-        speed
-      )
-    }
-
-    if (panelsRef.current.bottom) {
-      const targetRotation = bottomOpen * Math.PI / 2
-      panelsRef.current.bottom.rotation.x = THREE.MathUtils.lerp(
-        panelsRef.current.bottom.rotation.x,
-        Math.PI / 2 + targetRotation,
-        speed
-      )
-    }
+    animationStateRef.current = { leftOpen, rightOpen, topOpen, bottomOpen, animationSpeed }
   }, [leftOpen, rightOpen, topOpen, bottomOpen, animationSpeed])
 
   return (
