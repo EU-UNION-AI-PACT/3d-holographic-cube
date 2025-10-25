@@ -112,7 +112,7 @@ export default function HolographicCube({
       })
     }
 
-    const cubeSize = 2
+    const cubeSize = 3
 
     const leftGroup = new THREE.Group()
     const leftGeometry = new THREE.PlaneGeometry(cubeSize, cubeSize)
