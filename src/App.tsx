@@ -33,7 +33,7 @@ function App() {
   const [showCertificate, setShowCertificate] = useKV<boolean>('show-certificate', false)
   const [showOwnage, setShowOwnage] = useKV<boolean>('show-ownage', false)
   const [lampOn, setLampOn] = useKV<boolean>('lamp-on', true)
-  const [hasSeenOnboarding, setHasSeenOnboarding] = useKV<boolean>('has-seen-onboarding', true)
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useKV<boolean>('has-seen-onboarding', false)
 
   const leftOpen = activePanel === 'left' ? 1 : 0
   const rightOpen = activePanel === 'right' ? 1 : 0
@@ -80,24 +80,10 @@ function App() {
   }
 
   return (
-    <div className="relative w-full h-screen overflow-hidden" style={{ background: '#0a0520' }}>
+    <div className="relative w-full h-screen overflow-hidden bg-background">
       {!hasSeenOnboarding && (
         <OnboardingOverlay onComplete={handleOnboardingComplete} />
       )}
-      
-      <div style={{ 
-        position: 'absolute', 
-        top: '50%', 
-        left: '50%', 
-        transform: 'translate(-50%, -50%)',
-        color: 'white',
-        fontSize: '48px',
-        fontWeight: 'bold',
-        textAlign: 'center',
-        zIndex: 1000
-      }}>
-        TEST - SIEHST DU MICH?
-      </div>
       
       <SparklingBackground />
       
